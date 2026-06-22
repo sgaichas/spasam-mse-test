@@ -11,4 +11,4 @@ output: html_document
 
 ## MSE pages
 
-<a href="https://sgaichas.github.io/spasam-mse-testh/TestInstallation.html" target="_blank">The basic MSE workflow works - June 22 2026</a> 
+<a href="https://sgaichas.github.io/spasam-mse-test/TestInstallation.html" target="_blank">The basic MSE workflow works - June 22 2026</a> 
