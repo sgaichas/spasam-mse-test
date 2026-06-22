@@ -1,0 +1,364 @@
+---
+title: "Test Installation"
+author: "Sarah Gaichas"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+# Code taken from the SPASM.MSE vignettes here: https://lichengxue.github.io/SPASAM.MSE/index.html
+
+Starting with this one https://lichengxue.github.io/SPASAM.MSE/Management-Strategy-Evaluation.html
+
+## Setup the operating model OM
+
+Load wham and SPASAM.MSE
+
+```{r}
+library(wham)
+library(SPASAM.MSE)
+
+main.dir = here::here()
+```
+
+Basic info generation
+
+```{r}
+year_start <- 1
+year_end   <- 20
+MSE_years  <- 3
+
+info <- generate_basic_info(
+  n_stocks = 2,
+  n_regions = 2,
+  n_indices = 2,
+  n_fleets = 2,
+  n_seasons = 4,
+  base.years = year_start:year_end,
+  n_feedback_years = MSE_years,
+  life_history = "medium",
+  n_ages = 12,
+  F_info = list(F.year1 = 0.2, Fhist = "F-H-L", Fmax = 2, Fmin = 1, change_time = 0.5),
+  catch_info = list(catch_cv = 0.1, catch_Neff = 100),
+  index_info = list(index_cv = 0.1, index_Neff = 100, fracyr_indices = 0.625, q = 0.2),
+  fracyr_spawn = 0.625
+)
+
+basic_info = info$basic_info
+catch_info = info$catch_info
+index_info = info$index_info
+F_info     = info$F
+```
+
+I guess we'll have movement
+
+```{r}
+basic_info <- generate_NAA_where(basic_info, move.type = 2)
+move <- generate_move(
+  basic_info = basic_info,
+  move.type = 2,
+  move.rate = c(0.3, 0.1),
+  move.re = "iid_y",
+  move.sigma = 0.5
+)
+```
+
+and selectivity
+
+```{r}
+n_stocks  <- as.integer(basic_info['n_stocks'])
+n_regions <- as.integer(basic_info['n_regions'])
+n_fleets  <- as.integer(basic_info['n_fleets'])
+n_indices <- as.integer(basic_info['n_indices'])
+n_ages    <- as.integer(basic_info['n_ages'])
+
+fleet_pars <- c(5, 1)
+index_pars <- c(2, 1)
+sel <- list(
+  model = rep("logistic", n_fleets + n_indices),
+  initial_pars = c(rep(list(fleet_pars), n_fleets), rep(list(index_pars), n_indices))
+)
+```
+
+now the numbers at age NAA
+
+```{r}
+sigma      <- "rec+1"
+re_cor     <- "iid"
+ini.opt    <- "equilibrium"
+alpha <- 12
+beta  <- 1.5e-4
+
+NAA_sig <- 0.2
+sigma_vals <- array(NAA_sig, dim = c(n_stocks, n_regions, n_ages))
+log_N1 <- rep(10, n_stocks)
+N1_pars <- generate_ini_N1(basic_info, ini.opt, log_N1)
+
+NAA_re <- list(
+  N1_model = rep(ini.opt, n_stocks),
+  sigma = rep(sigma, n_stocks),
+  cor = rep(re_cor, n_stocks),
+  recruit_model = 3,
+  recruit_pars = rep(list(c(alpha, beta)), n_stocks),
+  sigma_vals = sigma_vals,
+  N1_pars = N1_pars
+)
+```
+
+make WHAM input
+
+```{r}
+input <- prepare_wham_input(
+  basic_info = basic_info,
+  selectivity = sel,
+  NAA_re = NAA_re,
+  move = move,
+  catch_info = catch_info,
+  index_info = index_info,
+  F = F_info
+)
+```
+
+make the OM
+
+```{r}
+random = input$random # check what processes are random effects
+input$random = NULL # so inner optimization won't change simulated RE
+om <- fit_wham(input, do.fit = F, do.brps = T, MakeADFun.silent = TRUE)
+# Note: do.fit must be FALSE (no modeling fitting yet)
+```
+
+make a dataset
+
+```{r}
+om_with_data <- update_om_fn(om, seed = 123, random = random)
+```
+
+setup assessment interval
+
+```{r}
+assess.interval <- 3 # Note: assessment interval is 3 years, given the feedback period is 3 years, there will be only 1 assessment
+base.years      <- year_start:year_end # Burn-in period
+first.year      <- head(base.years,1)
+terminal.year   <- tail(base.years,1)
+assess.years    <- seq(terminal.year, tail(om$years,1)-assess.interval,by = assess.interval)
+
+mods <- list() # Create a list to save MSE outputs
+```
+
+## Setup and run alternative estimation models EMs
+
+5 EMs are set up with varying degrees of spatial resolution from none to full
+
+## EM1 is all one area for stock and fleets
+
+```{r}
+n_stocks = n_regions = n_fleets = n_indices = 1
+
+sel_em <- list(model=rep("logistic",n_fleets+n_indices),
+               initial_pars=c(rep(list(fleet_pars),n_fleets),rep(list(index_pars),n_indices)))
+
+NAA_re_em <- list(N1_model="equilibrium",sigma="rec+1",cor="iid")
+
+mods[[1]] = loop_through_fn(om = om_with_data,
+                            em_info = info, 
+                            random = random,
+                            sel_em = sel_em, 
+                            NAA_re_em = NAA_re_em, 
+                            move_em = NULL,
+                            age_comp_em = "multinomial",
+                            em.opt = list(separate.em = TRUE, 
+                                          separate.em.type = 1, 
+                                          do.move = FALSE, 
+                                          est.move = FALSE), # here to choose panmictic 
+                            aggregate_catch_info = list(n_fleets = 1, 
+                                                        fleet_pointer = c(1,1), 
+                                                        use_catch_weighted_waa=TRUE, 
+                                                        catch_Neff = 100, 
+                                                        catch_cv = 0.1),
+                            aggregate_index_info = list(n_indices = 1, 
+                                                        index_pointer = c(1,1), 
+                                                        use_catch_weighted_waa=TRUE, 
+                                                        index_Neff = 100, 
+                                                        index_cv = 0.1),
+                            assess_years = assess.years, 
+                            assess_interval = assess.interval, 
+                            base_years = base.years,
+                            year.use = 20, # number of years of data you want to use in the assessment model
+                            seed = 123) # Must use the same seed (same as step 8) to generate random effects 
+```
+
+## EM2 is all one area for stock with fleets accounting for spatial structure
+
+```{r}
+n_stocks = n_regions = 1
+n_fleets = n_indices = 2
+sel_em <- list(model=rep("logistic",n_fleets+n_indices),
+               initial_pars=c(rep(list(fleet_pars),n_fleets),rep(list(index_pars),n_indices)))
+
+NAA_re_em <- list(N1_model="equilibrium",sigma="rec+1",cor="iid")
+
+mods[[2]] = loop_through_fn(om = om_with_data, 
+                            em_info = info, 
+                            random = random,
+                            sel_em = sel_em, 
+                            NAA_re_em = NAA_re_em, 
+                            move_em = NULL,
+                            age_comp_em = "multinomial",
+                            em.opt = list(separate.em = TRUE, 
+                                          separate.em.type = 2, 
+                                          do.move = FALSE, 
+                                          est.move = FALSE), # option to choose spatially implicit
+                            assess_years = assess.years, 
+                            assess_interval = assess.interval, 
+                            base_years = base.years,
+                            year.use = 20, # number of years of data you want to use in the assessment model
+                            seed = 123) 
+```
+
+## EM3 is separate assessments in each stock area
+
+```{r}
+n_stocks = n_regions = n_fleets = n_indices = 1
+
+sel_em <- list(model=rep("logistic",n_fleets+n_indices),
+               initial_pars=c(rep(list(fleet_pars),n_fleets),rep(list(index_pars),n_indices)))
+
+NAA_re_em <- list(N1_model="equilibrium",sigma = "rec+1", cor="iid")
+
+mods[[3]] = loop_through_fn(om = om_with_data, 
+                            em_info = info, 
+                            random = random,
+                            sel_em = sel_em, 
+                            NAA_re_em = NAA_re_em, 
+                            move_em = NULL,
+                            age_comp_em = "multinomial",
+                            em.opt = list(separate.em = TRUE, 
+                                          separate.em.type = 3, 
+                                          do.move = FALSE, 
+                                          est.move = FALSE), # option to choose separate panmictic  
+                            assess_years = assess.years, 
+                            assess_interval = assess.interval, 
+                            base_years = base.years,
+                            year.use = 20, # number of years of data you want to use in the assessment model
+                            seed = 123)
+```
+
+## EM4 is disaggregated areas for the stock and fleeets no movement
+
+```{r}
+n_stocks = n_regions = n_fleets = n_indices = 2
+
+sel_em <- list(model=rep("logistic",n_fleets+n_indices),
+               initial_pars=c(rep(list(fleet_pars),n_fleets),rep(list(index_pars),n_indices)))
+
+NAA_re_em <- list(N1_model=rep("equilibrium",n_stocks),
+                  sigma=rep("rec+1",n_stocks),
+                  cor=rep("iid",n_stocks),
+                  recruit_model = 2)
+
+mods[[4]] = loop_through_fn(om = om_with_data, 
+                            em_info = info, 
+                            random = random,
+                            sel_em = sel_em, 
+                            NAA_re_em = NAA_re_em, 
+                            move_em = NULL,
+                            age_comp_em = "multinomial",
+                            em.opt = list(separate.em = FALSE, 
+                                          separate.em.type = 3, 
+                                          do.move = FALSE, 
+                                          est.move = FALSE), # option to choose spatially disaggregated
+                            assess_years = assess.years, 
+                            assess_interval = assess.interval, 
+                            base_years = base.years,
+                            year.use = 20, # number of years of data you want to use in the assessment model
+                            seed = 123)
+```
+
+## EM5 is disaggregated areas for the stock and fleeets with movement
+
+```{r}
+n_stocks = n_regions = n_fleets = n_indices = 2
+
+sel_em <- list(model=rep("logistic",n_fleets+n_indices),
+               initial_pars=c(rep(list(fleet_pars),n_fleets),rep(list(index_pars),n_indices)))
+
+NAA_re_em <- list(N1_model=rep("equilibrium",n_stocks),
+                  sigma=rep("rec+1",n_stocks),
+                  cor=rep("iid",n_stocks),
+                  NAA_where = basic_info$NAA_where)
+
+# Set a prior information
+move_em <- generate_move(
+  basic_info = basic_info,
+  move.type = 2,
+  move.rate = c(0.3, 0.1),
+  move.re = "iid_y",
+  move.sigma = 0.5,
+  prior.sigma = 0.5,
+  use.prior = TRUE
+)
+
+mods[[5]] = loop_through_fn(om = om_with_data,
+                            em_info = info, 
+                            random = random,
+                            sel_em = sel_em, 
+                            NAA_re_em = NAA_re_em, 
+                            move_em = move_em,
+                            age_comp_em = "multinomial",
+                            em.opt = list(separate.em = FALSE, 
+                                          separate.em.type = 3, 
+                                          do.move = TRUE,
+                                          est.move = TRUE), # option to choose spatially explicit
+                            assess_years = assess.years, 
+                            assess_interval = assess.interval, 
+                            base_years = base.years,
+                            year.use = 20, # number of years of data you want to use in the assessment model
+                            seed = 123)
+```
+
+## Comparisons among EMs
+
+```{r}
+library(ggplot2)
+library(dplyr)
+
+yrs <- 14:23
+
+# --------------------------
+# Build dataframe
+# --------------------------
+plot_df <- do.call(rbind, lapply(seq_along(mods), function(i) {
+  
+  data.frame(
+    Year = rep(yrs, 2),
+    Value = c(
+      mods[[i]]$om$rep$SSB[yrs,1],
+      mods[[i]]$om$rep$pred_catch[yrs,1]
+    ),
+    Metric = rep(c("SSB", "Catch"), each = length(yrs)),
+    EM = paste0("EM ", i)
+  )
+  
+}))
+
+# --------------------------
+# Plot
+# --------------------------
+ggplot(plot_df, aes(x = Year, y = Value, color = EM)) +
+  geom_line(linewidth = 1.2) +
+  facet_wrap(~Metric, scales = "free_y") +
+  labs(
+    x = "Year",
+    y = NULL,
+    color = "Estimation Model"
+  ) +
+  theme_bw(base_size = 14) +
+  theme(
+    strip.text = element_text(face = "bold", size = 13),
+    legend.position = "top",
+    legend.title = element_text(face = "bold"),
+    axis.title = element_text(face = "bold")
+  ) +
+  scale_color_brewer(palette = "Set1")
+```
+
