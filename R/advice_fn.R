@@ -16,6 +16,7 @@
 #'         \item F\_XSPR (or F\_MSY if \code{use_FMSY = TRUE}).
 #'         \item Constant catch.
 #'         \item Hockey-stick scaling based on biomass thresholds.
+#'         \item MAFMC P* rule
 #'       }}
 #'     \item{\code{hcr.opts}}{List of options controlling HCR behavior:
 #'       \itemize{
@@ -24,6 +25,8 @@
 #'         \item \code{avg_yrs}, \code{cont.M.re}, \code{cont.move.re}
 #'         \item \code{max_percent}, \code{min_percent},
 #'           \code{BThresh_up}, \code{BThresh_low} (for HCR 3)
+#'         \item \code{max_pstar}, \code{mid_pstar}, \code{min_pstar},
+#'           \code{BThresh_high}, \code{OFL_CV} (for HCR 4)
 #'       }}
 #'   }
 #' @param proj.opts A named list of projection options passed directly to
@@ -58,6 +61,20 @@
 #' \code{percentFMSY} between \code{BThresh_low} and \code{BThresh_up}, bounded by
 #' \code{min_percent} and \code{max_percent}, and catch advice is then projected
 #' under that scaled reference point.
+#' 
+#' \strong{HCR 4}: MAFMC rule. The terminal biomass ratio
+#' \eqn{SSB_t / SSB_x} is mapped to the risk policy specified probability of 
+#' overfishing (pstar) based on three B thresholds and three pstar levels:
+#' \code{min_pstar} is specified below \code{BThresh_low}, a linear ramp between
+#' \code{min_pstar} and \code{mid_pstar} between \code{BThresh_low} and 
+#' \code{BThresh_up}, a linear ramp between \code{mid_pstar} and \code{max_pstar}
+#' between \code{BThresh_up} and \code{BThresh_high}, and \code{max_pstar} above
+#' \code{BThresh_high}. The OFL is calculated as in HCR 1, then the ABC (catch
+#' advice) is calculated using the resulting pstar as the percentile of OFL 
+#' assuming that the OFL is lognormally distributed with CV \code{OFL_CV}. Default
+#' values are 0.0, 0.45, and 0.49 for min, mid, and max pstar, 0.1, 1.0, and 1.5
+#' time B_msy for min, up, and high B thresholds, and 1.0 for OFL CV.
+#' 
 #'
 #' @return A matrix of projected catch advice for \code{pro.yr} years.
 #'
@@ -158,7 +175,7 @@ advice_fn <- function(em,
   hcr.type <- if (is.null(hcr$hcr.type)) 1 else hcr$hcr.type
   hcr.opts <- if (is.null(hcr$hcr.opts)) list() else hcr$hcr.opts
   
-  if (!hcr.type %in% c(1, 2, 3)) {
+  if (!hcr.type %in% c(1, 2, 3, 4)) {
     stop("hcr$hcr.type must be one of 1, 2, or 3.", call. = FALSE)
   }
   
@@ -423,6 +440,120 @@ advice_fn <- function(em,
     em_proj <- project_wham(em, proj.opts = proj_opts, MakeADFun.silent = TRUE)
     advice <- get_last_proj_catch(em_proj, pro.yr = pro.yr)
   }
+  
+  if (hcr.type == 4) {
+    
+    max_pstar <- if (is.null(hcr.opts$max_pstar)) 0.49 else hcr.opts$max_pstar
+    mid_pstar <- if (is.null(hcr.opts$mid_pstar)) 0.45 else hcr.opts$mid_pstar
+    min_pstar <- if (is.null(hcr.opts$min_pstar)) 0.0 else hcr.opts$min_pstar
+    
+    BThresh_high <- if (is.null(hcr.opts$BThresh_high)) 1.5 else hcr.opts$BThresh_high
+    BThresh_up  <- if (is.null(hcr.opts$BThresh_up)) 1.0 else hcr.opts$BThresh_up
+    BThresh_low <- if (is.null(hcr.opts$BThresh_low)) 0.1 else hcr.opts$BThresh_low
+    
+    if (BThresh_low >= BThresh_up) {
+      stop("BThresh_low must be smaller than BThresh_up.", call. = FALSE)
+    }
+
+    if (BThresh_up >= BThresh_high) {
+      stop("BThresh_up must be smaller than BThresh_high.", call. = FALSE)
+    }
+
+    
+    ############### UNMODIFIED BELOW HERE #######################
+    
+    if (isTRUE(use_FXSPR) && isTRUE(use_FMSY)) {
+      stop("For HCR type 3, choose only one reference path: use_FXSPR = TRUE or use_FMSY = TRUE.",
+           call. = FALSE)
+    }
+    
+    if (!isTRUE(use_FXSPR) && !isTRUE(use_FMSY)) {
+      stop("For HCR type 3, one of use_FXSPR or use_FMSY must be TRUE.",
+           call. = FALSE)
+    }
+    
+    if (isTRUE(use_FXSPR)) {
+      
+      if (is.null(em$rep$log_SSB_FXSPR)) {
+        stop("HCR type 3 with use_FXSPR = TRUE requires em$rep$log_SSB_FXSPR.",
+             call. = FALSE)
+      }
+      
+      if (is.null(em$rep$SSB)) {
+        stop("HCR type 3 requires em$rep$SSB.", call. = FALSE)
+      }
+      
+      SSB_x <- exp(em$rep$log_SSB_FXSPR[nrow(em$rep$log_SSB_FXSPR),
+                                        ncol(em$rep$log_SSB_FXSPR)])
+      SSB_t <- sum(em$rep$SSB[nrow(em$rep$SSB), ])
+      ratio <- SSB_t / SSB_x
+      
+      if (ratio >= BThresh_up) {
+        percent <- max_percent
+      } else if (ratio > BThresh_low) {
+        slope <- (max_percent - min_percent) / (BThresh_up - BThresh_low)
+        percent <- slope * (ratio - BThresh_low) + min_percent
+      } else {
+        percent <- min_percent
+      }
+      
+      cat(sprintf("SSB_t / SSB_XSPR = %.3f -> percentFXSPR = %.2f\n", ratio, percent))
+      
+      proj_opts$use.last.F   <- FALSE
+      proj_opts$use.avg.F    <- FALSE
+      proj_opts$use.FXSPR    <- TRUE
+      proj_opts$use.FMSY     <- FALSE
+      proj_opts$proj.F       <- NULL
+      proj_opts$proj.catch   <- NULL
+      proj_opts$percentFXSPR <- as.numeric(percent)
+      proj_opts$percentFMSY  <- NULL
+    }
+    
+    if (isTRUE(use_FMSY)) {
+      
+      if (is.null(em$rep$log_SSB_MSY)) {
+        stop("HCR type 3 with use_FMSY = TRUE requires em$rep$log_SSB_MSY.",
+             call. = FALSE)
+      }
+      
+      if (is.null(em$rep$SSB)) {
+        stop("HCR type 3 requires em$rep$SSB.", call. = FALSE)
+      }
+      
+      SSB_x <- exp(em$rep$log_SSB_MSY[nrow(em$rep$log_SSB_MSY),
+                                      ncol(em$rep$log_SSB_MSY)])
+      SSB_t <- sum(em$rep$SSB[nrow(em$rep$SSB), ])
+      ratio <- SSB_t / SSB_x
+      
+      if (ratio >= BThresh_up) {
+        percent <- max_percent
+      } else if (ratio > BThresh_low) {
+        slope <- (max_percent - min_percent) / (BThresh_up - BThresh_low)
+        percent <- slope * (ratio - BThresh_low) + min_percent
+      } else {
+        percent <- min_percent
+      }
+      
+      cat(sprintf("SSB_t / SSB_MSY = %.3f -> percentFMSY = %.2f\n", ratio, percent))
+      
+      proj_opts$use.last.F   <- FALSE
+      proj_opts$use.avg.F    <- FALSE
+      proj_opts$use.FXSPR    <- FALSE
+      proj_opts$use.FMSY     <- TRUE
+      proj_opts$proj.F       <- NULL
+      proj_opts$proj.catch   <- NULL
+      proj_opts$percentFMSY  <- as.numeric(percent)
+      proj_opts$percentFXSPR <- NULL
+    }
+    
+    validate_single_fspec(proj_opts, hcr.type = hcr.type)
+    
+    em_proj <- project_wham(em, proj.opts = proj_opts, MakeADFun.silent = TRUE)
+    advice <- get_last_proj_catch(em_proj, pro.yr = pro.yr)
+    
+    
+  }
+    
   
   ## ------------------------------
   ## Step 7. print and return
