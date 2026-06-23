@@ -1,0 +1,55 @@
+---
+title: "Summer Flounder Test"
+author: "Sarah Gaichas"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(wham)
+library(SPASAM.MSE)
+
+main.dir = here::here()
+
+```
+
+# Make a summer flounder model
+
+Use an old ASAP file from the rec_measures MSE to get started. This thing has 20 indices. What could go wrong?
+
+Try reading the ASAP file into WHAM:
+
+```{r, eval=FALSE}
+
+mod.dir="sf-test"
+write.dir <- here::here(sprintf("WHAMfits/%s/", mod.dir))
+dir.create(write.dir)
+
+sfasap <- wham::read_asap3_dat(here::here("assessments/F2021_2019_V1_MCMC.dat"))
+inputsf <- wham::prepare_wham_input(sfasap)
+
+mod <- fit_wham(inputsf, do.proj=FALSE,do.osa = TRUE,do.retro = TRUE,do.check = T,do.sdrep = TRUE)
+saveRDS(mod,file=file.path(write.dir,paste0(mod.dir,".rds")))
+plot_wham_output(mod, dir.main=file.path(write.dir),out.type="png")
+
+```
+That actually ran and produced output, gives the right trends
+
+```{r}
+knitr::include_graphics(here::here("WHAMfits/sf-test/plots_png/ref_points/FSPR_relative.png"))
+```
+
+Convergence? no
+
+```{r}
+
+mod <- readRDS(here::here("WHAMfits/sf-test/sf-test.rds"))
+wham::check_convergence(mod)
+
+
+```
+
+We'll need to simplify this
+

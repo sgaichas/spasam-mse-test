@@ -1,0 +1,879 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+\documentclass[
+]{article}
+\usepackage{xcolor}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{graphicx}
+\makeatletter
+\newsavebox\pandoc@box
+\newcommand*\pandocbounded[1]{% scales image to fit in text height/width
+  \sbox\pandoc@box{#1}%
+  \Gscale@div\@tempa{\textheight}{\dimexpr\ht\pandoc@box+\dp\pandoc@box\relax}%
+  \Gscale@div\@tempb{\linewidth}{\wd\pandoc@box}%
+  \ifdim\@tempb\p@<\@tempa\p@\let\@tempa\@tempb\fi% select the smaller of both
+  \ifdim\@tempa\p@<\p@\scalebox{\@tempa}{\usebox\pandoc@box}%
+  \else\usebox{\pandoc@box}%
+  \fi%
+}
+% Set default figure placement to htbp
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\usepackage{longtable}
+\usepackage{booktabs}
+\usepackage{caption,graphics}
+\usepackage{makecell}
+\usepackage{lscape}
+\renewcommand\figurename{Fig.}
+\captionsetup{labelsep=period, singlelinecheck=false}
+\newcommand{\changesize}[1]{\fontsize{#1pt}{#1pt}\selectfont}
+\renewcommand{\arraystretch}{1.5}
+\renewcommand\theadfont{}
+\usepackage{bookmark}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
+\hypersetup{
+  pdftitle={WHAM figures and tables},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+
+\title{WHAM figures and tables}
+\author{}
+\date{\vspace{-2.5em}}
+
+\begin{document}
+\maketitle
+
+\subsection{WHAM Tables}\label{wham-tables}
+
+\begin{landscape}
+\begin{longtable}[t]{lrrrr}
+\caption{\label{tab:par-table}Parameter estimates, standard errors, and confidence intervals. Rounded to 3 decimal places.}\\
+\toprule
+  & Estimate & Std. Error & 95\% CI lower & 95\% CI upper\\
+\midrule
+\endfirsthead
+\caption[]{Parameter estimates, standard errors, and confidence intervals. Rounded to 3 decimal places. \textit{(continued)}}\\
+\toprule
+  & Estimate & Std. Error & 95\% CI lower & 95\% CI upper\\
+\midrule
+\endhead
+
+\endfoot
+\bottomrule
+\endlastfoot
+NEC ALB Winter fully selected q & $2.640\times 10^{-4}$ & -- & -- & --\\
+NEC ALB Spring fully selected q & $3.041\times 10^{-5}$ & -- & -- & --\\
+NEC ALB Fall fully selected q & $3.759\times 10^{-5}$ & -- & -- & --\\
+MA Spring fully selected q & $4.018\times 10^{-5}$ & -- & -- & --\\
+MA Fall fully selected q & $4.009\times 10^{-5}$ & -- & -- & --\\
+\addlinespace
+RI Fall fully selected q & $2.981\times 10^{-5}$ & -- & -- & --\\
+RI Monthly fully selected q & $1.967\times 10^{-5}$ & -- & -- & --\\
+CT Spring fully selected q & $2.205\times 10^{-5}$ & -- & -- & --\\
+CT Fall fully selected q & $3.068\times 10^{-5}$ & -- & -- & --\\
+NJ fully selected q & $1.006\times 10^{-4}$ & -- & -- & --\\
+\addlinespace
+DE fully selected q & $6.305\times 10^{-6}$ & -- & -- & --\\
+MAYOY fully selected q & $1.743\times 10^{-8}$ & -- & -- & --\\
+DEESYOY fully selected q & $1.308\times 10^{-6}$ & -- & -- & --\\
+DEIBYOY fully selected q & $4.973\times 10^{-6}$ & -- & -- & --\\
+MDYOY fully selected q & $1.781\times 10^{-4}$ & -- & -- & --\\
+\addlinespace
+VIMSYOY fully selected q & $2.055\times 10^{-5}$ & -- & -- & --\\
+NCYOY fully selected q & $1.841\times 10^{-4}$ & -- & -- & --\\
+ChesMMAP fully selected q & $2.379\times 10^{-4}$ & -- & -- & --\\
+NEAMAP Spring fully selected q & $2.268\times 10^{-5}$ & -- & -- & --\\
+NEAMAP Fall fully selected q & $1.994\times 10^{-5}$ & -- & -- & --\\
+\addlinespace
+NY fully selected q & $6.836\times 10^{-6}$ & -- & -- & --\\
+URIGSO fully selected q & $1.957\times 10^{-5}$ & -- & -- & --\\
+MARMAP LV fully selected q & $0.001$ & -- & -- & --\\
+ECOMON LV fully selected q & $0.007$ & -- & -- & --\\
+NEC BIG Spring fully selected q & $0.494$ & -- & -- & --\\
+\addlinespace
+NEC BIG Fall fully selected q & $0.342$ & -- & -- & --\\
+COMMLAND Selectivity for age 1 (Block 1) & $0.016$ & -- & -- & --\\
+COMMLAND Selectivity for age 2 (Block 1) & $0.370$ & -- & -- & --\\
+COMMLAND Selectivity for age 3 (Block 1) & $1.000$ & -- & -- & --\\
+COMMLAND Selectivity for age 4 (Block 1) & $1.000$ & -- & -- & --\\
+\addlinespace
+COMMLAND Selectivity for age 5 (Block 1) & $1.000$ & -- & -- & --\\
+COMMLAND Selectivity for age 6 (Block 1) & $1.000$ & -- & -- & --\\
+COMMLAND Selectivity for age 7 (Block 1) & $1.000$ & -- & -- & --\\
+COMMLAND Selectivity for age 8+ (Block 1) & $1.000$ & -- & -- & --\\
+COMMLAND Selectivity for age 1 (Block 2) & $4.956\times 10^{-4}$ & -- & -- & --\\
+\addlinespace
+COMMLAND Selectivity for age 2 (Block 2) & $0.106$ & -- & -- & --\\
+COMMLAND Selectivity for age 3 (Block 2) & $1.000$ & -- & -- & --\\
+COMMLAND Selectivity for age 4 (Block 2) & $1.000$ & -- & -- & --\\
+COMMLAND Selectivity for age 5 (Block 2) & $1.000$ & -- & -- & --\\
+COMMLAND Selectivity for age 6 (Block 2) & $1.000$ & -- & -- & --\\
+\addlinespace
+COMMLAND Selectivity for age 7 (Block 2) & $1.000$ & -- & -- & --\\
+COMMLAND Selectivity for age 8+ (Block 2) & $1.000$ & -- & -- & --\\
+COMMLAND Selectivity for age 1 (Block 3) & $0.000$ & -- & -- & --\\
+COMMLAND Selectivity for age 2 (Block 3) & $0.031$ & -- & -- & --\\
+COMMLAND Selectivity for age 3 (Block 3) & $0.253$ & -- & -- & --\\
+\addlinespace
+COMMLAND Selectivity for age 4 (Block 3) & $1.000$ & -- & -- & --\\
+COMMLAND Selectivity for age 5 (Block 3) & $1.000$ & -- & -- & --\\
+COMMLAND Selectivity for age 6 (Block 3) & $1.000$ & -- & -- & --\\
+COMMLAND Selectivity for age 7 (Block 3) & $1.000$ & -- & -- & --\\
+COMMLAND Selectivity for age 8+ (Block 3) & $0.808$ & -- & -- & --\\
+\addlinespace
+COMMDISC Selectivity for age 1 (Block 4) & $0.195$ & -- & -- & --\\
+COMMDISC Selectivity for age 2 (Block 4) & $1.000$ & -- & -- & --\\
+COMMDISC Selectivity for age 3 (Block 4) & $1.000$ & -- & -- & --\\
+COMMDISC Selectivity for age 4 (Block 4) & $0.094$ & -- & -- & --\\
+COMMDISC Selectivity for age 5 (Block 4) & $0.017$ & -- & -- & --\\
+\addlinespace
+COMMDISC Selectivity for age 6 (Block 4) & $7.887\times 10^{-5}$ & -- & -- & --\\
+COMMDISC Selectivity for age 7 (Block 4) & $0.000$ & -- & -- & --\\
+COMMDISC Selectivity for age 8+ (Block 4) & $0.000$ & -- & -- & --\\
+COMMDISC Selectivity for age 1 (Block 5) & $0.073$ & -- & -- & --\\
+COMMDISC Selectivity for age 2 (Block 5) & $0.335$ & -- & -- & --\\
+\addlinespace
+COMMDISC Selectivity for age 3 (Block 5) & $1.000$ & -- & -- & --\\
+COMMDISC Selectivity for age 4 (Block 5) & $1.000$ & -- & -- & --\\
+COMMDISC Selectivity for age 5 (Block 5) & $0.957$ & -- & -- & --\\
+COMMDISC Selectivity for age 6 (Block 5) & $0.976$ & -- & -- & --\\
+COMMDISC Selectivity for age 7 (Block 5) & $1.000$ & -- & -- & --\\
+\addlinespace
+COMMDISC Selectivity for age 8+ (Block 5) & $1.000$ & -- & -- & --\\
+COMMDISC Selectivity for age 1 (Block 6) & $0.024$ & -- & -- & --\\
+COMMDISC Selectivity for age 2 (Block 6) & $0.223$ & -- & -- & --\\
+COMMDISC Selectivity for age 3 (Block 6) & $0.637$ & -- & -- & --\\
+COMMDISC Selectivity for age 4 (Block 6) & $1.000$ & -- & -- & --\\
+\addlinespace
+COMMDISC Selectivity for age 5 (Block 6) & $1.000$ & -- & -- & --\\
+COMMDISC Selectivity for age 6 (Block 6) & $1.000$ & -- & -- & --\\
+COMMDISC Selectivity for age 7 (Block 6) & $0.875$ & -- & -- & --\\
+COMMDISC Selectivity for age 8+ (Block 6) & $0.485$ & -- & -- & --\\
+RECLAND Selectivity for age 1 (Block 7) & $0.037$ & -- & -- & --\\
+\addlinespace
+RECLAND Selectivity for age 2 (Block 7) & $0.603$ & -- & -- & --\\
+RECLAND Selectivity for age 3 (Block 7) & $1.000$ & -- & -- & --\\
+RECLAND Selectivity for age 4 (Block 7) & $1.000$ & -- & -- & --\\
+RECLAND Selectivity for age 5 (Block 7) & $1.000$ & -- & -- & --\\
+RECLAND Selectivity for age 6 (Block 7) & $1.000$ & -- & -- & --\\
+\addlinespace
+RECLAND Selectivity for age 7 (Block 7) & $1.000$ & -- & -- & --\\
+RECLAND Selectivity for age 8+ (Block 7) & $1.000$ & -- & -- & --\\
+RECLAND Selectivity for age 1 (Block 8) & $0.002$ & -- & -- & --\\
+RECLAND Selectivity for age 2 (Block 8) & $0.120$ & -- & -- & --\\
+RECLAND Selectivity for age 3 (Block 8) & $1.000$ & -- & -- & --\\
+\addlinespace
+RECLAND Selectivity for age 4 (Block 8) & $1.000$ & -- & -- & --\\
+RECLAND Selectivity for age 5 (Block 8) & $1.000$ & -- & -- & --\\
+RECLAND Selectivity for age 6 (Block 8) & $1.000$ & -- & -- & --\\
+RECLAND Selectivity for age 7 (Block 8) & $1.000$ & -- & -- & --\\
+RECLAND Selectivity for age 8+ (Block 8) & $1.000$ & -- & -- & --\\
+\addlinespace
+RECLAND Selectivity for age 1 (Block 9) & $0.001$ & -- & -- & --\\
+RECLAND Selectivity for age 2 (Block 9) & $0.012$ & -- & -- & --\\
+RECLAND Selectivity for age 3 (Block 9) & $0.135$ & -- & -- & --\\
+RECLAND Selectivity for age 4 (Block 9) & $0.465$ & -- & -- & --\\
+RECLAND Selectivity for age 5 (Block 9) & $1.000$ & -- & -- & --\\
+\addlinespace
+RECLAND Selectivity for age 6 (Block 9) & $1.000$ & -- & -- & --\\
+RECLAND Selectivity for age 7 (Block 9) & $1.000$ & -- & -- & --\\
+RECLAND Selectivity for age 8+ (Block 9) & $1.000$ & -- & -- & --\\
+RECDISC Selectivity for age 1 (Block 10) & $0.096$ & -- & -- & --\\
+RECDISC Selectivity for age 2 (Block 10) & $1.000$ & -- & -- & --\\
+\addlinespace
+RECDISC Selectivity for age 3 (Block 10) & $0.068$ & -- & -- & --\\
+RECDISC Selectivity for age 4 (Block 10) & $0.000$ & -- & -- & --\\
+RECDISC Selectivity for age 5 (Block 10) & $0.000$ & -- & -- & --\\
+RECDISC Selectivity for age 6 (Block 10) & $0.000$ & -- & -- & --\\
+RECDISC Selectivity for age 7 (Block 10) & $0.000$ & -- & -- & --\\
+\addlinespace
+RECDISC Selectivity for age 8+ (Block 10) & $0.000$ & -- & -- & --\\
+RECDISC Selectivity for age 1 (Block 11) & $0.088$ & -- & -- & --\\
+RECDISC Selectivity for age 2 (Block 11) & $0.658$ & -- & -- & --\\
+RECDISC Selectivity for age 3 (Block 11) & $1.000$ & -- & -- & --\\
+RECDISC Selectivity for age 4 (Block 11) & $0.647$ & -- & -- & --\\
+\addlinespace
+RECDISC Selectivity for age 5 (Block 11) & $0.118$ & -- & -- & --\\
+RECDISC Selectivity for age 6 (Block 11) & $0.044$ & -- & -- & --\\
+RECDISC Selectivity for age 7 (Block 11) & $0.003$ & -- & -- & --\\
+RECDISC Selectivity for age 8+ (Block 11) & $0.092$ & -- & -- & --\\
+RECDISC Selectivity for age 1 (Block 12) & $0.067$ & -- & -- & --\\
+\addlinespace
+RECDISC Selectivity for age 2 (Block 12) & $0.534$ & -- & -- & --\\
+RECDISC Selectivity for age 3 (Block 12) & $1.000$ & -- & -- & --\\
+RECDISC Selectivity for age 4 (Block 12) & $1.000$ & -- & -- & --\\
+RECDISC Selectivity for age 5 (Block 12) & $1.000$ & -- & -- & --\\
+RECDISC Selectivity for age 6 (Block 12) & $0.553$ & -- & -- & --\\
+\addlinespace
+RECDISC Selectivity for age 7 (Block 12) & $0.393$ & -- & -- & --\\
+RECDISC Selectivity for age 8+ (Block 12) & $0.317$ & -- & -- & --\\
+NEC ALB Winter Selectivity for age 1 (Block 13) & $0.000$ & -- & -- & --\\
+NEC ALB Winter Selectivity for age 2 (Block 13) & $0.378$ & -- & -- & --\\
+NEC ALB Winter Selectivity for age 3 (Block 13) & $1.000$ & -- & -- & --\\
+\addlinespace
+NEC ALB Winter Selectivity for age 4 (Block 13) & $1.000$ & -- & -- & --\\
+NEC ALB Winter Selectivity for age 5 (Block 13) & $1.000$ & -- & -- & --\\
+NEC ALB Winter Selectivity for age 6 (Block 13) & $1.000$ & -- & -- & --\\
+NEC ALB Winter Selectivity for age 7 (Block 13) & $0.800$ & -- & -- & --\\
+NEC ALB Winter Selectivity for age 8+ (Block 13) & $0.800$ & -- & -- & --\\
+\addlinespace
+NEC ALB Spring Selectivity for age 1 (Block 14) & $0.000$ & -- & -- & --\\
+NEC ALB Spring Selectivity for age 2 (Block 14) & $0.398$ & -- & -- & --\\
+NEC ALB Spring Selectivity for age 3 (Block 14) & $1.000$ & -- & -- & --\\
+NEC ALB Spring Selectivity for age 4 (Block 14) & $1.000$ & -- & -- & --\\
+NEC ALB Spring Selectivity for age 5 (Block 14) & $1.000$ & -- & -- & --\\
+\addlinespace
+NEC ALB Spring Selectivity for age 6 (Block 14) & $1.000$ & -- & -- & --\\
+NEC ALB Spring Selectivity for age 7 (Block 14) & $1.000$ & -- & -- & --\\
+NEC ALB Spring Selectivity for age 8+ (Block 14) & $0.800$ & -- & -- & --\\
+NEC ALB Fall Selectivity for age 1 (Block 15) & $0.222$ & -- & -- & --\\
+NEC ALB Fall Selectivity for age 2 (Block 15) & $1.000$ & -- & -- & --\\
+\addlinespace
+NEC ALB Fall Selectivity for age 3 (Block 15) & $1.000$ & -- & -- & --\\
+NEC ALB Fall Selectivity for age 4 (Block 15) & $1.000$ & -- & -- & --\\
+NEC ALB Fall Selectivity for age 5 (Block 15) & $1.000$ & -- & -- & --\\
+NEC ALB Fall Selectivity for age 6 (Block 15) & $1.000$ & -- & -- & --\\
+NEC ALB Fall Selectivity for age 7 (Block 15) & $1.000$ & -- & -- & --\\
+\addlinespace
+NEC ALB Fall Selectivity for age 8+ (Block 15) & $0.800$ & -- & -- & --\\
+MA Spring Selectivity for age 1 (Block 16) & $0.000$ & -- & -- & --\\
+MA Spring Selectivity for age 2 (Block 16) & $0.171$ & -- & -- & --\\
+MA Spring Selectivity for age 3 (Block 16) & $1.000$ & -- & -- & --\\
+MA Spring Selectivity for age 4 (Block 16) & $1.000$ & -- & -- & --\\
+\addlinespace
+MA Spring Selectivity for age 5 (Block 16) & $1.000$ & -- & -- & --\\
+MA Spring Selectivity for age 6 (Block 16) & $1.000$ & -- & -- & --\\
+MA Spring Selectivity for age 7 (Block 16) & $1.000$ & -- & -- & --\\
+MA Spring Selectivity for age 8+ (Block 16) & $1.000$ & -- & -- & --\\
+MA Fall Selectivity for age 1 (Block 17) & $0.029$ & -- & -- & --\\
+\addlinespace
+MA Fall Selectivity for age 2 (Block 17) & $1.000$ & -- & -- & --\\
+MA Fall Selectivity for age 3 (Block 17) & $1.000$ & -- & -- & --\\
+MA Fall Selectivity for age 4 (Block 17) & $1.000$ & -- & -- & --\\
+MA Fall Selectivity for age 5 (Block 17) & $1.000$ & -- & -- & --\\
+MA Fall Selectivity for age 6 (Block 17) & $0.200$ & -- & -- & --\\
+\addlinespace
+MA Fall Selectivity for age 7 (Block 17) & $0.200$ & -- & -- & --\\
+MA Fall Selectivity for age 8+ (Block 17) & $0.200$ & -- & -- & --\\
+RI Fall Selectivity for age 1 (Block 18) & $0.052$ & -- & -- & --\\
+RI Fall Selectivity for age 2 (Block 18) & $1.000$ & -- & -- & --\\
+RI Fall Selectivity for age 3 (Block 18) & $1.000$ & -- & -- & --\\
+\addlinespace
+RI Fall Selectivity for age 4 (Block 18) & $1.000$ & -- & -- & --\\
+RI Fall Selectivity for age 5 (Block 18) & $1.000$ & -- & -- & --\\
+RI Fall Selectivity for age 6 (Block 18) & $1.000$ & -- & -- & --\\
+RI Fall Selectivity for age 7 (Block 18) & $0.600$ & -- & -- & --\\
+RI Fall Selectivity for age 8+ (Block 18) & $0.600$ & -- & -- & --\\
+\addlinespace
+RI Monthly Selectivity for age 1 (Block 19) & $0.040$ & -- & -- & --\\
+RI Monthly Selectivity for age 2 (Block 19) & $0.384$ & -- & -- & --\\
+RI Monthly Selectivity for age 3 (Block 19) & $1.000$ & -- & -- & --\\
+RI Monthly Selectivity for age 4 (Block 19) & $1.000$ & -- & -- & --\\
+RI Monthly Selectivity for age 5 (Block 19) & $1.000$ & -- & -- & --\\
+\addlinespace
+RI Monthly Selectivity for age 6 (Block 19) & $1.000$ & -- & -- & --\\
+RI Monthly Selectivity for age 7 (Block 19) & $1.000$ & -- & -- & --\\
+RI Monthly Selectivity for age 8+ (Block 19) & $0.800$ & -- & -- & --\\
+CT Spring Selectivity for age 1 (Block 20) & $0.000$ & -- & -- & --\\
+CT Spring Selectivity for age 2 (Block 20) & $0.684$ & -- & -- & --\\
+\addlinespace
+CT Spring Selectivity for age 3 (Block 20) & $1.000$ & -- & -- & --\\
+CT Spring Selectivity for age 4 (Block 20) & $1.000$ & -- & -- & --\\
+CT Spring Selectivity for age 5 (Block 20) & $1.000$ & -- & -- & --\\
+CT Spring Selectivity for age 6 (Block 20) & $1.000$ & -- & -- & --\\
+CT Spring Selectivity for age 7 (Block 20) & $1.000$ & -- & -- & --\\
+\addlinespace
+CT Spring Selectivity for age 8+ (Block 20) & $0.990$ & -- & -- & --\\
+CT Fall Selectivity for age 1 (Block 21) & $0.072$ & -- & -- & --\\
+CT Fall Selectivity for age 2 (Block 21) & $1.000$ & -- & -- & --\\
+CT Fall Selectivity for age 3 (Block 21) & $1.000$ & -- & -- & --\\
+CT Fall Selectivity for age 4 (Block 21) & $1.000$ & -- & -- & --\\
+\addlinespace
+CT Fall Selectivity for age 5 (Block 21) & $1.000$ & -- & -- & --\\
+CT Fall Selectivity for age 6 (Block 21) & $1.000$ & -- & -- & --\\
+CT Fall Selectivity for age 7 (Block 21) & $0.400$ & -- & -- & --\\
+CT Fall Selectivity for age 8+ (Block 21) & $0.400$ & -- & -- & --\\
+NJ Selectivity for age 1 (Block 22) & $0.309$ & -- & -- & --\\
+\addlinespace
+NJ Selectivity for age 2 (Block 22) & $1.000$ & -- & -- & --\\
+NJ Selectivity for age 3 (Block 22) & $1.000$ & -- & -- & --\\
+NJ Selectivity for age 4 (Block 22) & $0.620$ & -- & -- & --\\
+NJ Selectivity for age 5 (Block 22) & $0.477$ & -- & -- & --\\
+NJ Selectivity for age 6 (Block 22) & $0.300$ & -- & -- & --\\
+\addlinespace
+NJ Selectivity for age 7 (Block 22) & $0.300$ & -- & -- & --\\
+NJ Selectivity for age 8+ (Block 22) & $0.300$ & -- & -- & --\\
+DE Selectivity for age 1 (Block 23) & $1.000$ & -- & -- & --\\
+DE Selectivity for age 2 (Block 23) & $1.000$ & -- & -- & --\\
+DE Selectivity for age 3 (Block 23) & $1.000$ & -- & -- & --\\
+\addlinespace
+DE Selectivity for age 4 (Block 23) & $1.000$ & -- & -- & --\\
+DE Selectivity for age 5 (Block 23) & $1.000$ & -- & -- & --\\
+DE Selectivity for age 6 (Block 23) & $0.400$ & -- & -- & --\\
+DE Selectivity for age 7 (Block 23) & $0.400$ & -- & -- & --\\
+DE Selectivity for age 8+ (Block 23) & $0.400$ & -- & -- & --\\
+\addlinespace
+MAYOY Selectivity for age 1 (Block 24) & $1.000$ & -- & -- & --\\
+MAYOY Selectivity for age 2 (Block 24) & $0.000$ & -- & -- & --\\
+MAYOY Selectivity for age 3 (Block 24) & $0.000$ & -- & -- & --\\
+MAYOY Selectivity for age 4 (Block 24) & $0.000$ & -- & -- & --\\
+MAYOY Selectivity for age 5 (Block 24) & $0.000$ & -- & -- & --\\
+\addlinespace
+MAYOY Selectivity for age 6 (Block 24) & $0.000$ & -- & -- & --\\
+MAYOY Selectivity for age 7 (Block 24) & $0.000$ & -- & -- & --\\
+MAYOY Selectivity for age 8+ (Block 24) & $0.000$ & -- & -- & --\\
+DEESYOY Selectivity for age 1 (Block 25) & $1.000$ & -- & -- & --\\
+DEESYOY Selectivity for age 2 (Block 25) & $0.000$ & -- & -- & --\\
+\addlinespace
+DEESYOY Selectivity for age 3 (Block 25) & $0.000$ & -- & -- & --\\
+DEESYOY Selectivity for age 4 (Block 25) & $0.000$ & -- & -- & --\\
+DEESYOY Selectivity for age 5 (Block 25) & $0.000$ & -- & -- & --\\
+DEESYOY Selectivity for age 6 (Block 25) & $0.000$ & -- & -- & --\\
+DEESYOY Selectivity for age 7 (Block 25) & $0.000$ & -- & -- & --\\
+\addlinespace
+DEESYOY Selectivity for age 8+ (Block 25) & $0.000$ & -- & -- & --\\
+DEIBYOY Selectivity for age 1 (Block 26) & $1.000$ & -- & -- & --\\
+DEIBYOY Selectivity for age 2 (Block 26) & $0.000$ & -- & -- & --\\
+DEIBYOY Selectivity for age 3 (Block 26) & $0.000$ & -- & -- & --\\
+DEIBYOY Selectivity for age 4 (Block 26) & $0.000$ & -- & -- & --\\
+\addlinespace
+DEIBYOY Selectivity for age 5 (Block 26) & $0.000$ & -- & -- & --\\
+DEIBYOY Selectivity for age 6 (Block 26) & $0.000$ & -- & -- & --\\
+DEIBYOY Selectivity for age 7 (Block 26) & $0.000$ & -- & -- & --\\
+DEIBYOY Selectivity for age 8+ (Block 26) & $0.000$ & -- & -- & --\\
+MDYOY Selectivity for age 1 (Block 27) & $1.000$ & -- & -- & --\\
+\addlinespace
+MDYOY Selectivity for age 2 (Block 27) & $0.000$ & -- & -- & --\\
+MDYOY Selectivity for age 3 (Block 27) & $0.000$ & -- & -- & --\\
+MDYOY Selectivity for age 4 (Block 27) & $0.000$ & -- & -- & --\\
+MDYOY Selectivity for age 5 (Block 27) & $0.000$ & -- & -- & --\\
+MDYOY Selectivity for age 6 (Block 27) & $0.000$ & -- & -- & --\\
+\addlinespace
+MDYOY Selectivity for age 7 (Block 27) & $0.000$ & -- & -- & --\\
+MDYOY Selectivity for age 8+ (Block 27) & $0.000$ & -- & -- & --\\
+VIMSYOY Selectivity for age 1 (Block 28) & $1.000$ & -- & -- & --\\
+VIMSYOY Selectivity for age 2 (Block 28) & $0.000$ & -- & -- & --\\
+VIMSYOY Selectivity for age 3 (Block 28) & $0.000$ & -- & -- & --\\
+\addlinespace
+VIMSYOY Selectivity for age 4 (Block 28) & $0.000$ & -- & -- & --\\
+VIMSYOY Selectivity for age 5 (Block 28) & $0.000$ & -- & -- & --\\
+VIMSYOY Selectivity for age 6 (Block 28) & $0.000$ & -- & -- & --\\
+VIMSYOY Selectivity for age 7 (Block 28) & $0.000$ & -- & -- & --\\
+VIMSYOY Selectivity for age 8+ (Block 28) & $0.000$ & -- & -- & --\\
+\addlinespace
+NCYOY Selectivity for age 1 (Block 29) & $1.000$ & -- & -- & --\\
+NCYOY Selectivity for age 2 (Block 29) & $0.000$ & -- & -- & --\\
+NCYOY Selectivity for age 3 (Block 29) & $0.000$ & -- & -- & --\\
+NCYOY Selectivity for age 4 (Block 29) & $0.000$ & -- & -- & --\\
+NCYOY Selectivity for age 5 (Block 29) & $0.000$ & -- & -- & --\\
+\addlinespace
+NCYOY Selectivity for age 6 (Block 29) & $0.000$ & -- & -- & --\\
+NCYOY Selectivity for age 7 (Block 29) & $0.000$ & -- & -- & --\\
+NCYOY Selectivity for age 8+ (Block 29) & $0.000$ & -- & -- & --\\
+ChesMMAP Selectivity for age 1 (Block 30) & $1.000$ & -- & -- & --\\
+ChesMMAP Selectivity for age 2 (Block 30) & $0.470$ & -- & -- & --\\
+\addlinespace
+ChesMMAP Selectivity for age 3 (Block 30) & $0.248$ & -- & -- & --\\
+ChesMMAP Selectivity for age 4 (Block 30) & $0.215$ & -- & -- & --\\
+ChesMMAP Selectivity for age 5 (Block 30) & $0.339$ & -- & -- & --\\
+ChesMMAP Selectivity for age 6 (Block 30) & $0.000$ & -- & -- & --\\
+ChesMMAP Selectivity for age 7 (Block 30) & $0.000$ & -- & -- & --\\
+\addlinespace
+ChesMMAP Selectivity for age 8+ (Block 30) & $0.000$ & -- & -- & --\\
+NEAMAP Spring Selectivity for age 1 (Block 31) & $0.000$ & -- & -- & --\\
+NEAMAP Spring Selectivity for age 2 (Block 31) & $0.962$ & -- & -- & --\\
+NEAMAP Spring Selectivity for age 3 (Block 31) & $1.000$ & -- & -- & --\\
+NEAMAP Spring Selectivity for age 4 (Block 31) & $1.000$ & -- & -- & --\\
+\addlinespace
+NEAMAP Spring Selectivity for age 5 (Block 31) & $1.000$ & -- & -- & --\\
+NEAMAP Spring Selectivity for age 6 (Block 31) & $0.800$ & -- & -- & --\\
+NEAMAP Spring Selectivity for age 7 (Block 31) & $0.800$ & -- & -- & --\\
+NEAMAP Spring Selectivity for age 8+ (Block 31) & $0.800$ & -- & -- & --\\
+NEAMAP Fall Selectivity for age 1 (Block 32) & $1.000$ & -- & -- & --\\
+\addlinespace
+NEAMAP Fall Selectivity for age 2 (Block 32) & $1.000$ & -- & -- & --\\
+NEAMAP Fall Selectivity for age 3 (Block 32) & $1.000$ & -- & -- & --\\
+NEAMAP Fall Selectivity for age 4 (Block 32) & $1.000$ & -- & -- & --\\
+NEAMAP Fall Selectivity for age 5 (Block 32) & $0.535$ & -- & -- & --\\
+NEAMAP Fall Selectivity for age 6 (Block 32) & $0.600$ & -- & -- & --\\
+\addlinespace
+NEAMAP Fall Selectivity for age 7 (Block 32) & $0.600$ & -- & -- & --\\
+NEAMAP Fall Selectivity for age 8+ (Block 32) & $0.600$ & -- & -- & --\\
+NY Selectivity for age 1 (Block 33) & $0.355$ & -- & -- & --\\
+NY Selectivity for age 2 (Block 33) & $1.000$ & -- & -- & --\\
+NY Selectivity for age 3 (Block 33) & $1.000$ & -- & -- & --\\
+\addlinespace
+NY Selectivity for age 4 (Block 33) & $1.000$ & -- & -- & --\\
+NY Selectivity for age 5 (Block 33) & $1.000$ & -- & -- & --\\
+NY Selectivity for age 6 (Block 33) & $0.600$ & -- & -- & --\\
+NY Selectivity for age 7 (Block 33) & $0.600$ & -- & -- & --\\
+NY Selectivity for age 8+ (Block 33) & $0.000$ & -- & -- & --\\
+\addlinespace
+URIGSO Selectivity for age 1 (Block 34) & $1.000$ & -- & -- & --\\
+URIGSO Selectivity for age 2 (Block 34) & $1.000$ & -- & -- & --\\
+URIGSO Selectivity for age 3 (Block 34) & $1.000$ & -- & -- & --\\
+URIGSO Selectivity for age 4 (Block 34) & $1.000$ & -- & -- & --\\
+URIGSO Selectivity for age 5 (Block 34) & $1.000$ & -- & -- & --\\
+\addlinespace
+URIGSO Selectivity for age 6 (Block 34) & $1.000$ & -- & -- & --\\
+URIGSO Selectivity for age 7 (Block 34) & $1.000$ & -- & -- & --\\
+URIGSO Selectivity for age 8+ (Block 34) & $1.000$ & -- & -- & --\\
+MARMAP LV Selectivity for age 1 (Block 35) & $1.000$ & -- & -- & --\\
+MARMAP LV Selectivity for age 2 (Block 35) & $1.000$ & -- & -- & --\\
+\addlinespace
+MARMAP LV Selectivity for age 3 (Block 35) & $1.000$ & -- & -- & --\\
+MARMAP LV Selectivity for age 4 (Block 35) & $1.000$ & -- & -- & --\\
+MARMAP LV Selectivity for age 5 (Block 35) & $1.000$ & -- & -- & --\\
+MARMAP LV Selectivity for age 6 (Block 35) & $1.000$ & -- & -- & --\\
+MARMAP LV Selectivity for age 7 (Block 35) & $1.000$ & -- & -- & --\\
+\addlinespace
+MARMAP LV Selectivity for age 8+ (Block 35) & $1.000$ & -- & -- & --\\
+ECOMON LV Selectivity for age 1 (Block 36) & $1.000$ & -- & -- & --\\
+ECOMON LV Selectivity for age 2 (Block 36) & $1.000$ & -- & -- & --\\
+ECOMON LV Selectivity for age 3 (Block 36) & $1.000$ & -- & -- & --\\
+ECOMON LV Selectivity for age 4 (Block 36) & $1.000$ & -- & -- & --\\
+\addlinespace
+ECOMON LV Selectivity for age 5 (Block 36) & $1.000$ & -- & -- & --\\
+ECOMON LV Selectivity for age 6 (Block 36) & $1.000$ & -- & -- & --\\
+ECOMON LV Selectivity for age 7 (Block 36) & $1.000$ & -- & -- & --\\
+ECOMON LV Selectivity for age 8+ (Block 36) & $1.000$ & -- & -- & --\\
+NEC BIG Spring Selectivity for age 1 (Block 37) & $0.000$ & -- & -- & --\\
+\addlinespace
+NEC BIG Spring Selectivity for age 2 (Block 37) & $1.000$ & -- & -- & --\\
+NEC BIG Spring Selectivity for age 3 (Block 37) & $1.000$ & -- & -- & --\\
+NEC BIG Spring Selectivity for age 4 (Block 37) & $1.000$ & -- & -- & --\\
+NEC BIG Spring Selectivity for age 5 (Block 37) & $1.000$ & -- & -- & --\\
+NEC BIG Spring Selectivity for age 6 (Block 37) & $1.000$ & -- & -- & --\\
+\addlinespace
+NEC BIG Spring Selectivity for age 7 (Block 37) & $1.000$ & -- & -- & --\\
+NEC BIG Spring Selectivity for age 8+ (Block 37) & $1.000$ & -- & -- & --\\
+NEC BIG Fall Selectivity for age 1 (Block 38) & $1.000$ & -- & -- & --\\
+NEC BIG Fall Selectivity for age 2 (Block 38) & $1.000$ & -- & -- & --\\
+NEC BIG Fall Selectivity for age 3 (Block 38) & $1.000$ & -- & -- & --\\
+\addlinespace
+NEC BIG Fall Selectivity for age 4 (Block 38) & $1.000$ & -- & -- & --\\
+NEC BIG Fall Selectivity for age 5 (Block 38) & $1.000$ & -- & -- & --\\
+NEC BIG Fall Selectivity for age 6 (Block 38) & $1.000$ & -- & -- & --\\
+NEC BIG Fall Selectivity for age 7 (Block 38) & $1.000$ & -- & -- & --\\
+NEC BIG Fall Selectivity for age 8+ (Block 38) & $1.000$ & -- & -- & --\\*
+\end{longtable}
+\end{landscape}
+
+\subsubsection{Abundance at age}\label{abundance-at-age}
+
+\begin{longtable}[t]{lrrrrrrrr}
+\caption{\label{tab:stock_1-region_1-NAA-table}Abundance at age (1000s) for stock 1 in region 1.}\\
+\toprule
+  & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8+\\
+\midrule
+\endfirsthead
+\caption[]{Abundance at age (1000s) for stock 1 in region 1. \textit{(continued)}}\\
+\toprule
+  & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8+\\
+\midrule
+\endhead
+
+\endfoot
+\bottomrule
+\endlastfoot
+1982 & 81296 & 54612 & 28017 & 3617 & 1248 & 383 & 187 & 328\\
+1983 & 98291 & 61318 & 28239 & 9699 & 1267 & 437 & 134 & 182\\
+1984 & 44564 & 73209 & 25578 & 6651 & 2312 & 302 & 104 & 76\\
+1985 & 75819 & 33194 & 29923 & 5368 & 1414 & 492 & 64 & 38\\
+1986 & 78279 & 56473 & 13406 & 5978 & 1085 & 286 & 99 & 21\\
+\addlinespace
+1987 & 50689 & 58041 & 21448 & 2507 & 1133 & 206 & 54 & 23\\
+1988 & 12549 & 37644 & 22605 & 4157 & 493 & 223 & 40 & 15\\
+1989 & 36258 & 9252 & 12631 & 3017 & 565 & 67 & 30 & 8\\
+1990 & 43021 & 26455 & 3450 & 2183 & 594 & 112 & 13 & 8\\
+1991 & 46629 & 31364 & 11049 & 935 & 690 & 190 & 36 & 7\\
+\addlinespace
+1992 & 46003 & 34484 & 12716 & 2593 & 230 & 170 & 47 & 11\\
+1993 & 43750 & 32528 & 10992 & 2196 & 580 & 52 & 39 & 13\\
+1994 & 58589 & 31975 & 12525 & 2662 & 585 & 156 & 14 & 14\\
+1995 & 78809 & 42421 & 12140 & 2865 & 716 & 160 & 43 & 8\\
+1996 & 60675 & 60115 & 27760 & 3219 & 782 & 202 & 45 & 14\\
+\addlinespace
+1997 & 51584 & 46260 & 40358 & 9146 & 1085 & 270 & 70 & 21\\
+1998 & 55097 & 39554 & 32582 & 17409 & 4029 & 487 & 121 & 41\\
+1999 & 43674 & 42203 & 27548 & 13678 & 7509 & 1785 & 216 & 72\\
+2000 & 60190 & 33348 & 29415 & 12922 & 6614 & 3753 & 895 & 145\\
+2001 & 64837 & 45991 & 23080 & 12849 & 5824 & 3083 & 1756 & 487\\
+\addlinespace
+2002 & 68405 & 49626 & 32514 & 11931 & 6881 & 3240 & 1724 & 1259\\
+2003 & 51031 & 52450 & 35732 & 17611 & 6632 & 3920 & 1851 & 1711\\
+2004 & 73857 & 39086 & 37525 & 19315 & 9802 & 3803 & 2256 & 2059\\
+2005 & 41231 & 56580 & 27970 & 19846 & 10493 & 5467 & 2127 & 2424\\
+2006 & 50025 & 31554 & 40151 & 14398 & 10526 & 5740 & 3002 & 2509\\
+\addlinespace
+2007 & 53555 & 38329 & 22786 & 23054 & 8496 & 6380 & 3491 & 3365\\
+2008 & 64026 & 40978 & 27610 & 13563 & 14144 & 5380 & 4055 & 4374\\
+2009 & 76500 & 49193 & 30596 & 19313 & 8504 & 8323 & 3226 & 5214\\
+2010 & 53268 & 58745 & 36554 & 21162 & 11884 & 4937 & 4938 & 5210\\
+2011 & 32644 & 40875 & 43369 & 24848 & 12564 & 6626 & 2826 & 6043\\
+\addlinespace
+2012 & 36161 & 25044 & 30101 & 29143 & 14187 & 6661 & 3616 & 5089\\
+2013 & 38632 & 27781 & 18673 & 20826 & 17518 & 7809 & 3742 & 5062\\
+2014 & 42741 & 29662 & 20616 & 12743 & 12167 & 9199 & 4199 & 4910\\
+2015 & 29506 & 32804 & 21949 & 14041 & 7525 & 6506 & 5050 & 5180\\
+2016 & 34140 & 22660 & 24372 & 15037 & 8260 & 4078 & 3607 & 5872\\
+\addlinespace
+2017 & 46573 & 26219 & 16852 & 16784 & 9045 & 4503 & 2272 & 5477\\
+2018 & 59822 & 35761 & 19490 & 11708 & 10527 & 5301 & 2699 & 4831\\
+2019 & 48431 & 45978 & 26776 & 13741 & 7477 & 6344 & 3247 & 4775\\*
+\end{longtable}
+
+\subsubsection{Fishing mortality at age by
+region}\label{fishing-mortality-at-age-by-region}
+
+\begin{longtable}[t]{lrrrrrrrr}
+\caption{\label{tab:region_1-region-FAA-table}Total fishing mortality at age in region 1.}\\
+\toprule
+  & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8+\\
+\midrule
+\endfirsthead
+\caption[]{Total fishing mortality at age in region 1. \textit{(continued)}}\\
+\toprule
+  & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8+\\
+\midrule
+\endhead
+
+\endfoot
+\bottomrule
+\endlastfoot
+1982 & 0.022 & 0.400 & 0.801 & 0.799 & 0.799 & 0.799 & 0.799 & 0.799\\
+1983 & 0.035 & 0.614 & 1.186 & 1.184 & 1.184 & 1.184 & 1.184 & 1.184\\
+1984 & 0.035 & 0.635 & 1.301 & 1.298 & 1.298 & 1.298 & 1.298 & 1.298\\
+1985 & 0.035 & 0.647 & 1.351 & 1.349 & 1.349 & 1.349 & 1.349 & 1.349\\
+1986 & 0.039 & 0.708 & 1.417 & 1.413 & 1.413 & 1.413 & 1.413 & 1.413\\
+\addlinespace
+1987 & 0.038 & 0.683 & 1.381 & 1.377 & 1.377 & 1.377 & 1.377 & 1.377\\
+1988 & 0.045 & 0.832 & 1.754 & 1.746 & 1.746 & 1.746 & 1.746 & 1.746\\
+1989 & 0.055 & 0.726 & 1.495 & 1.375 & 1.365 & 1.363 & 1.363 & 1.363\\
+1990 & 0.056 & 0.613 & 1.045 & 0.902 & 0.890 & 0.888 & 0.888 & 0.888\\
+1991 & 0.042 & 0.643 & 1.190 & 1.153 & 1.150 & 1.149 & 1.149 & 1.149\\
+\addlinespace
+1992 & 0.087 & 0.883 & 1.496 & 1.248 & 1.227 & 1.223 & 1.223 & 1.223\\
+1993 & 0.054 & 0.694 & 1.158 & 1.072 & 1.065 & 1.064 & 1.064 & 1.064\\
+1994 & 0.063 & 0.708 & 1.215 & 1.063 & 1.050 & 1.047 & 1.047 & 1.047\\
+1995 & 0.011 & 0.164 & 1.067 & 1.048 & 1.016 & 1.013 & 1.013 & 1.017\\
+1996 & 0.011 & 0.138 & 0.850 & 0.837 & 0.813 & 0.812 & 0.813 & 0.816\\
+\addlinespace
+1997 & 0.006 & 0.091 & 0.581 & 0.570 & 0.552 & 0.551 & 0.550 & 0.553\\
+1998 & 0.007 & 0.102 & 0.608 & 0.591 & 0.564 & 0.561 & 0.560 & 0.564\\
+1999 & 0.010 & 0.101 & 0.497 & 0.477 & 0.444 & 0.440 & 0.439 & 0.444\\
+2000 & 0.009 & 0.108 & 0.568 & 0.547 & 0.513 & 0.510 & 0.508 & 0.513\\
+2001 & 0.007 & 0.087 & 0.400 & 0.375 & 0.336 & 0.331 & 0.328 & 0.335\\
+\addlinespace
+2002 & 0.006 & 0.068 & 0.353 & 0.337 & 0.313 & 0.310 & 0.308 & 0.312\\
+2003 & 0.007 & 0.075 & 0.355 & 0.336 & 0.306 & 0.303 & 0.301 & 0.306\\
+2004 & 0.006 & 0.075 & 0.377 & 0.360 & 0.334 & 0.331 & 0.329 & 0.334\\
+2005 & 0.007 & 0.083 & 0.404 & 0.384 & 0.353 & 0.350 & 0.348 & 0.353\\
+2006 & 0.006 & 0.066 & 0.295 & 0.278 & 0.251 & 0.247 & 0.246 & 0.250\\
+\addlinespace
+2007 & 0.008 & 0.068 & 0.259 & 0.239 & 0.207 & 0.203 & 0.202 & 0.207\\
+2008 & 0.004 & 0.032 & 0.097 & 0.217 & 0.280 & 0.262 & 0.252 & 0.221\\
+2009 & 0.004 & 0.037 & 0.109 & 0.236 & 0.294 & 0.272 & 0.261 & 0.225\\
+2010 & 0.005 & 0.043 & 0.126 & 0.271 & 0.334 & 0.308 & 0.295 & 0.254\\
+2011 & 0.005 & 0.046 & 0.138 & 0.310 & 0.384 & 0.356 & 0.343 & 0.298\\
+\addlinespace
+2012 & 0.004 & 0.034 & 0.108 & 0.259 & 0.347 & 0.327 & 0.317 & 0.285\\
+2013 & 0.004 & 0.038 & 0.122 & 0.287 & 0.394 & 0.370 & 0.360 & 0.325\\
+2014 & 0.005 & 0.041 & 0.124 & 0.277 & 0.376 & 0.350 & 0.338 & 0.305\\
+2015 & 0.004 & 0.037 & 0.118 & 0.281 & 0.362 & 0.340 & 0.330 & 0.292\\
+2016 & 0.004 & 0.036 & 0.113 & 0.258 & 0.357 & 0.335 & 0.325 & 0.293\\
+\addlinespace
+2017 & 0.004 & 0.037 & 0.104 & 0.216 & 0.284 & 0.262 & 0.250 & 0.221\\
+2018 & 0.003 & 0.029 & 0.090 & 0.198 & 0.256 & 0.240 & 0.231 & 0.202\\
+2019 & 0.004 & 0.034 & 0.104 & 0.241 & 0.298 & 0.278 & 0.269 & 0.233\\*
+\end{longtable}
+
+\subsubsection{Fishing mortality at age by
+fleet}\label{fishing-mortality-at-age-by-fleet}
+
+\begin{longtable}[t]{lrrrrrrrr}
+\caption{\label{tab:COMMLAND-fleet-FAA-table}Total fishing mortality at age in COMMLAND.}\\
+\toprule
+  & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8+\\
+\midrule
+\endfirsthead
+\caption[]{Total fishing mortality at age in COMMLAND. \textit{(continued)}}\\
+\toprule
+  & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8+\\
+\midrule
+\endhead
+
+\endfoot
+\bottomrule
+\endlastfoot
+1982 & 0.006 & 0.154 & 0.417 & 0.417 & 0.417 & 0.417 & 0.417 & 0.417\\
+1983 & 0.008 & 0.193 & 0.522 & 0.522 & 0.522 & 0.522 & 0.522 & 0.522\\
+1984 & 0.012 & 0.287 & 0.775 & 0.775 & 0.775 & 0.775 & 0.775 & 0.775\\
+1985 & 0.012 & 0.293 & 0.794 & 0.794 & 0.793 & 0.793 & 0.793 & 0.793\\
+1986 & 0.012 & 0.293 & 0.792 & 0.792 & 0.792 & 0.792 & 0.792 & 0.792\\
+\addlinespace
+1987 & 0.013 & 0.302 & 0.817 & 0.817 & 0.817 & 0.817 & 0.817 & 0.817\\
+1988 & 0.018 & 0.430 & 1.164 & 1.164 & 1.164 & 1.164 & 1.164 & 1.164\\
+1989 & 0.017 & 0.398 & 1.077 & 1.077 & 1.077 & 1.077 & 1.077 & 1.077\\
+1990 & 0.008 & 0.194 & 0.525 & 0.525 & 0.525 & 0.525 & 0.525 & 0.525\\
+1991 & 0.010 & 0.239 & 0.647 & 0.647 & 0.647 & 0.647 & 0.647 & 0.647\\
+\addlinespace
+1992 & 0.012 & 0.282 & 0.763 & 0.763 & 0.763 & 0.763 & 0.763 & 0.763\\
+1993 & 0.009 & 0.219 & 0.591 & 0.591 & 0.591 & 0.591 & 0.591 & 0.591\\
+1994 & 0.010 & 0.227 & 0.615 & 0.615 & 0.615 & 0.615 & 0.615 & 0.615\\
+1995 & 0.000 & 0.067 & 0.630 & 0.630 & 0.630 & 0.630 & 0.630 & 0.630\\
+1996 & 0.000 & 0.038 & 0.354 & 0.354 & 0.354 & 0.354 & 0.354 & 0.354\\
+\addlinespace
+1997 & 0.000 & 0.017 & 0.162 & 0.162 & 0.162 & 0.162 & 0.162 & 0.162\\
+1998 & 0.000 & 0.017 & 0.160 & 0.160 & 0.160 & 0.160 & 0.160 & 0.160\\
+1999 & 0.000 & 0.016 & 0.150 & 0.150 & 0.150 & 0.150 & 0.150 & 0.150\\
+2000 & 0.000 & 0.015 & 0.139 & 0.139 & 0.139 & 0.139 & 0.139 & 0.139\\
+2001 & 0.000 & 0.013 & 0.121 & 0.121 & 0.121 & 0.121 & 0.121 & 0.121\\
+\addlinespace
+2002 & 0.000 & 0.015 & 0.146 & 0.146 & 0.146 & 0.146 & 0.146 & 0.146\\
+2003 & 0.000 & 0.012 & 0.116 & 0.116 & 0.116 & 0.116 & 0.116 & 0.116\\
+2004 & 0.000 & 0.015 & 0.140 & 0.140 & 0.140 & 0.140 & 0.140 & 0.140\\
+2005 & 0.000 & 0.017 & 0.158 & 0.158 & 0.158 & 0.158 & 0.158 & 0.158\\
+2006 & 0.000 & 0.011 & 0.099 & 0.099 & 0.099 & 0.099 & 0.099 & 0.099\\
+\addlinespace
+2007 & 0.000 & 0.008 & 0.075 & 0.075 & 0.075 & 0.075 & 0.075 & 0.075\\
+2008 & 0.000 & 0.003 & 0.024 & 0.096 & 0.096 & 0.096 & 0.096 & 0.077\\
+2009 & 0.000 & 0.003 & 0.027 & 0.108 & 0.108 & 0.108 & 0.108 & 0.087\\
+2010 & 0.000 & 0.004 & 0.033 & 0.129 & 0.129 & 0.129 & 0.129 & 0.104\\
+2011 & 0.000 & 0.005 & 0.040 & 0.159 & 0.159 & 0.159 & 0.159 & 0.129\\
+\addlinespace
+2012 & 0.000 & 0.004 & 0.031 & 0.121 & 0.121 & 0.121 & 0.121 & 0.098\\
+2013 & 0.000 & 0.004 & 0.032 & 0.125 & 0.125 & 0.125 & 0.125 & 0.101\\
+2014 & 0.000 & 0.004 & 0.029 & 0.113 & 0.113 & 0.113 & 0.113 & 0.091\\
+2015 & 0.000 & 0.004 & 0.036 & 0.141 & 0.141 & 0.141 & 0.141 & 0.114\\
+2016 & 0.000 & 0.003 & 0.026 & 0.103 & 0.103 & 0.103 & 0.103 & 0.083\\
+\addlinespace
+2017 & 0.000 & 0.003 & 0.021 & 0.082 & 0.082 & 0.082 & 0.082 & 0.066\\
+2018 & 0.000 & 0.003 & 0.022 & 0.085 & 0.085 & 0.085 & 0.085 & 0.069\\
+2019 & 0.000 & 0.004 & 0.032 & 0.125 & 0.125 & 0.125 & 0.125 & 0.101\\*
+\end{longtable}
+
+\begin{longtable}[t]{lrrrrrrrr}
+\caption{\label{tab:COMMDISC-fleet-FAA-table}Total fishing mortality at age in COMMDISC.}\\
+\toprule
+  & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8+\\
+\midrule
+\endfirsthead
+\caption[]{Total fishing mortality at age in COMMDISC. \textit{(continued)}}\\
+\toprule
+  & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8+\\
+\midrule
+\endhead
+
+\endfoot
+\bottomrule
+\endlastfoot
+1982 & 0.000 & 0.001 & 0.001 & 0.000 & 0.000 & 0.000 & 0.000 & 0.000\\
+1983 & 0.000 & 0.001 & 0.001 & 0.000 & 0.000 & 0.000 & 0.000 & 0.000\\
+1984 & 0.000 & 0.001 & 0.001 & 0.000 & 0.000 & 0.000 & 0.000 & 0.000\\
+1985 & 0.000 & 0.001 & 0.001 & 0.000 & 0.000 & 0.000 & 0.000 & 0.000\\
+1986 & 0.000 & 0.001 & 0.001 & 0.000 & 0.000 & 0.000 & 0.000 & 0.000\\
+\addlinespace
+1987 & 0.000 & 0.001 & 0.001 & 0.000 & 0.000 & 0.000 & 0.000 & 0.000\\
+1988 & 0.001 & 0.005 & 0.005 & 0.000 & 0.000 & 0.000 & 0.000 & 0.000\\
+1989 & 0.026 & 0.131 & 0.131 & 0.012 & 0.002 & 0.000 & 0.000 & 0.000\\
+1990 & 0.030 & 0.154 & 0.154 & 0.015 & 0.003 & 0.000 & 0.000 & 0.000\\
+1991 & 0.007 & 0.036 & 0.036 & 0.003 & 0.001 & 0.000 & 0.000 & 0.000\\
+\addlinespace
+1992 & 0.053 & 0.270 & 0.270 & 0.025 & 0.005 & 0.000 & 0.000 & 0.000\\
+1993 & 0.017 & 0.087 & 0.087 & 0.008 & 0.001 & 0.000 & 0.000 & 0.000\\
+1994 & 0.032 & 0.164 & 0.164 & 0.015 & 0.003 & 0.000 & 0.000 & 0.000\\
+1995 & 0.005 & 0.023 & 0.070 & 0.070 & 0.067 & 0.068 & 0.070 & 0.070\\
+1996 & 0.007 & 0.033 & 0.099 & 0.099 & 0.094 & 0.096 & 0.099 & 0.099\\
+\addlinespace
+1997 & 0.002 & 0.010 & 0.030 & 0.030 & 0.029 & 0.029 & 0.030 & 0.030\\
+1998 & 0.002 & 0.008 & 0.022 & 0.022 & 0.021 & 0.022 & 0.022 & 0.022\\
+1999 & 0.004 & 0.019 & 0.057 & 0.057 & 0.055 & 0.056 & 0.057 & 0.057\\
+2000 & 0.003 & 0.014 & 0.043 & 0.043 & 0.041 & 0.042 & 0.043 & 0.043\\
+2001 & 0.001 & 0.003 & 0.009 & 0.009 & 0.009 & 0.009 & 0.009 & 0.009\\
+\addlinespace
+2002 & 0.001 & 0.006 & 0.018 & 0.018 & 0.017 & 0.017 & 0.018 & 0.018\\
+2003 & 0.002 & 0.007 & 0.021 & 0.021 & 0.020 & 0.020 & 0.021 & 0.021\\
+2004 & 0.002 & 0.009 & 0.026 & 0.026 & 0.025 & 0.026 & 0.026 & 0.026\\
+2005 & 0.002 & 0.010 & 0.030 & 0.030 & 0.029 & 0.029 & 0.030 & 0.030\\
+2006 & 0.002 & 0.008 & 0.024 & 0.024 & 0.023 & 0.023 & 0.024 & 0.024\\
+\addlinespace
+2007 & 0.002 & 0.011 & 0.033 & 0.033 & 0.032 & 0.032 & 0.033 & 0.033\\
+2008 & 0.001 & 0.005 & 0.015 & 0.024 & 0.024 & 0.024 & 0.021 & 0.011\\
+2009 & 0.001 & 0.006 & 0.018 & 0.028 & 0.028 & 0.028 & 0.024 & 0.014\\
+2010 & 0.001 & 0.006 & 0.019 & 0.029 & 0.029 & 0.029 & 0.025 & 0.014\\
+2011 & 0.001 & 0.005 & 0.014 & 0.022 & 0.022 & 0.022 & 0.019 & 0.011\\
+\addlinespace
+2012 & 0.000 & 0.003 & 0.010 & 0.015 & 0.015 & 0.015 & 0.013 & 0.007\\
+2013 & 0.000 & 0.004 & 0.010 & 0.016 & 0.016 & 0.016 & 0.014 & 0.008\\
+2014 & 0.000 & 0.004 & 0.012 & 0.019 & 0.019 & 0.019 & 0.016 & 0.009\\
+2015 & 0.000 & 0.004 & 0.012 & 0.018 & 0.018 & 0.018 & 0.016 & 0.009\\
+2016 & 0.001 & 0.005 & 0.014 & 0.021 & 0.021 & 0.021 & 0.019 & 0.010\\
+\addlinespace
+2017 & 0.001 & 0.006 & 0.016 & 0.025 & 0.025 & 0.025 & 0.022 & 0.012\\
+2018 & 0.001 & 0.006 & 0.017 & 0.026 & 0.026 & 0.026 & 0.023 & 0.013\\
+2019 & 0.001 & 0.005 & 0.014 & 0.022 & 0.022 & 0.022 & 0.020 & 0.011\\*
+\end{longtable}
+
+\begin{longtable}[t]{lrrrrrrrr}
+\caption{\label{tab:RECLAND-fleet-FAA-table}Total fishing mortality at age in RECLAND.}\\
+\toprule
+  & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8+\\
+\midrule
+\endfirsthead
+\caption[]{Total fishing mortality at age in RECLAND. \textit{(continued)}}\\
+\toprule
+  & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8+\\
+\midrule
+\endhead
+
+\endfoot
+\bottomrule
+\endlastfoot
+1982 & 0.014 & 0.230 & 0.382 & 0.382 & 0.382 & 0.382 & 0.382 & 0.382\\
+1983 & 0.024 & 0.400 & 0.662 & 0.662 & 0.662 & 0.662 & 0.662 & 0.662\\
+1984 & 0.019 & 0.315 & 0.523 & 0.523 & 0.523 & 0.523 & 0.523 & 0.523\\
+1985 & 0.020 & 0.335 & 0.555 & 0.555 & 0.555 & 0.555 & 0.555 & 0.555\\
+1986 & 0.023 & 0.375 & 0.622 & 0.622 & 0.622 & 0.622 & 0.622 & 0.622\\
+\addlinespace
+1987 & 0.021 & 0.338 & 0.560 & 0.560 & 0.560 & 0.560 & 0.560 & 0.560\\
+1988 & 0.021 & 0.351 & 0.582 & 0.582 & 0.582 & 0.582 & 0.582 & 0.582\\
+1989 & 0.010 & 0.172 & 0.286 & 0.286 & 0.286 & 0.286 & 0.286 & 0.286\\
+1990 & 0.013 & 0.219 & 0.363 & 0.363 & 0.363 & 0.363 & 0.363 & 0.363\\
+1991 & 0.018 & 0.303 & 0.502 & 0.502 & 0.502 & 0.502 & 0.502 & 0.502\\
+\addlinespace
+1992 & 0.017 & 0.277 & 0.460 & 0.460 & 0.460 & 0.460 & 0.460 & 0.460\\
+1993 & 0.017 & 0.285 & 0.473 & 0.473 & 0.473 & 0.473 & 0.473 & 0.473\\
+1994 & 0.016 & 0.261 & 0.433 & 0.433 & 0.433 & 0.433 & 0.433 & 0.433\\
+1995 & 0.000 & 0.038 & 0.312 & 0.312 & 0.312 & 0.312 & 0.312 & 0.312\\
+1996 & 0.001 & 0.043 & 0.360 & 0.360 & 0.360 & 0.360 & 0.360 & 0.360\\
+\addlinespace
+1997 & 0.001 & 0.043 & 0.358 & 0.358 & 0.358 & 0.358 & 0.358 & 0.358\\
+1998 & 0.001 & 0.045 & 0.377 & 0.377 & 0.377 & 0.377 & 0.377 & 0.377\\
+1999 & 0.000 & 0.028 & 0.232 & 0.232 & 0.232 & 0.232 & 0.232 & 0.232\\
+2000 & 0.000 & 0.039 & 0.326 & 0.326 & 0.326 & 0.326 & 0.326 & 0.326\\
+2001 & 0.000 & 0.024 & 0.198 & 0.198 & 0.198 & 0.198 & 0.198 & 0.198\\
+\addlinespace
+2002 & 0.000 & 0.017 & 0.144 & 0.144 & 0.144 & 0.144 & 0.144 & 0.144\\
+2003 & 0.000 & 0.020 & 0.164 & 0.164 & 0.164 & 0.164 & 0.164 & 0.164\\
+2004 & 0.000 & 0.020 & 0.162 & 0.162 & 0.162 & 0.162 & 0.162 & 0.162\\
+2005 & 0.000 & 0.019 & 0.160 & 0.160 & 0.160 & 0.160 & 0.160 & 0.160\\
+2006 & 0.000 & 0.015 & 0.123 & 0.123 & 0.123 & 0.123 & 0.123 & 0.123\\
+\addlinespace
+2007 & 0.000 & 0.011 & 0.094 & 0.094 & 0.094 & 0.094 & 0.094 & 0.094\\
+2008 & 0.000 & 0.001 & 0.016 & 0.055 & 0.119 & 0.119 & 0.119 & 0.119\\
+2009 & 0.000 & 0.001 & 0.015 & 0.051 & 0.109 & 0.109 & 0.109 & 0.109\\
+2010 & 0.000 & 0.001 & 0.016 & 0.055 & 0.118 & 0.118 & 0.118 & 0.118\\
+2011 & 0.000 & 0.002 & 0.019 & 0.064 & 0.139 & 0.139 & 0.139 & 0.139\\
+\addlinespace
+2012 & 0.000 & 0.002 & 0.022 & 0.077 & 0.165 & 0.165 & 0.165 & 0.165\\
+2013 & 0.000 & 0.002 & 0.027 & 0.093 & 0.200 & 0.200 & 0.200 & 0.200\\
+2014 & 0.000 & 0.002 & 0.025 & 0.086 & 0.186 & 0.186 & 0.186 & 0.186\\
+2015 & 0.000 & 0.002 & 0.021 & 0.071 & 0.153 & 0.153 & 0.153 & 0.153\\
+2016 & 0.000 & 0.002 & 0.025 & 0.086 & 0.184 & 0.184 & 0.184 & 0.184\\
+\addlinespace
+2017 & 0.000 & 0.001 & 0.017 & 0.059 & 0.127 & 0.127 & 0.127 & 0.127\\
+2018 & 0.000 & 0.001 & 0.015 & 0.051 & 0.109 & 0.109 & 0.109 & 0.109\\
+2019 & 0.000 & 0.001 & 0.014 & 0.050 & 0.107 & 0.107 & 0.107 & 0.107\\*
+\end{longtable}
+
+\begin{longtable}[t]{lrrrrrrrr}
+\caption{\label{tab:RECDISC-fleet-FAA-table}Total fishing mortality at age in RECDISC.}\\
+\toprule
+  & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8+\\
+\midrule
+\endfirsthead
+\caption[]{Total fishing mortality at age in RECDISC. \textit{(continued)}}\\
+\toprule
+  & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8+\\
+\midrule
+\endhead
+
+\endfoot
+\bottomrule
+\endlastfoot
+1982 & 0.001 & 0.014 & 0.001 & 0.000 & 0.000 & 0.000 & 0.000 & 0.000\\
+1983 & 0.002 & 0.021 & 0.001 & 0.000 & 0.000 & 0.000 & 0.000 & 0.000\\
+1984 & 0.003 & 0.031 & 0.002 & 0.000 & 0.000 & 0.000 & 0.000 & 0.000\\
+1985 & 0.002 & 0.018 & 0.001 & 0.000 & 0.000 & 0.000 & 0.000 & 0.000\\
+1986 & 0.004 & 0.040 & 0.003 & 0.000 & 0.000 & 0.000 & 0.000 & 0.000\\
+\addlinespace
+1987 & 0.004 & 0.042 & 0.003 & 0.000 & 0.000 & 0.000 & 0.000 & 0.000\\
+1988 & 0.004 & 0.046 & 0.003 & 0.000 & 0.000 & 0.000 & 0.000 & 0.000\\
+1989 & 0.002 & 0.025 & 0.002 & 0.000 & 0.000 & 0.000 & 0.000 & 0.000\\
+1990 & 0.004 & 0.046 & 0.003 & 0.000 & 0.000 & 0.000 & 0.000 & 0.000\\
+1991 & 0.006 & 0.065 & 0.004 & 0.000 & 0.000 & 0.000 & 0.000 & 0.000\\
+\addlinespace
+1992 & 0.005 & 0.054 & 0.004 & 0.000 & 0.000 & 0.000 & 0.000 & 0.000\\
+1993 & 0.010 & 0.103 & 0.007 & 0.000 & 0.000 & 0.000 & 0.000 & 0.000\\
+1994 & 0.005 & 0.056 & 0.004 & 0.000 & 0.000 & 0.000 & 0.000 & 0.000\\
+1995 & 0.005 & 0.036 & 0.055 & 0.036 & 0.006 & 0.002 & 0.000 & 0.005\\
+1996 & 0.003 & 0.024 & 0.037 & 0.024 & 0.004 & 0.002 & 0.000 & 0.003\\
+\addlinespace
+1997 & 0.003 & 0.020 & 0.031 & 0.020 & 0.004 & 0.001 & 0.000 & 0.003\\
+1998 & 0.004 & 0.032 & 0.049 & 0.031 & 0.006 & 0.002 & 0.000 & 0.004\\
+1999 & 0.005 & 0.038 & 0.058 & 0.037 & 0.007 & 0.003 & 0.000 & 0.005\\
+2000 & 0.005 & 0.040 & 0.060 & 0.039 & 0.007 & 0.003 & 0.000 & 0.006\\
+2001 & 0.006 & 0.047 & 0.072 & 0.046 & 0.008 & 0.003 & 0.000 & 0.007\\
+\addlinespace
+2002 & 0.004 & 0.030 & 0.045 & 0.029 & 0.005 & 0.002 & 0.000 & 0.004\\
+2003 & 0.005 & 0.036 & 0.055 & 0.035 & 0.006 & 0.002 & 0.000 & 0.005\\
+2004 & 0.004 & 0.031 & 0.048 & 0.031 & 0.006 & 0.002 & 0.000 & 0.004\\
+2005 & 0.005 & 0.037 & 0.056 & 0.036 & 0.007 & 0.002 & 0.000 & 0.005\\
+2006 & 0.004 & 0.032 & 0.049 & 0.032 & 0.006 & 0.002 & 0.000 & 0.004\\
+\addlinespace
+2007 & 0.005 & 0.038 & 0.057 & 0.037 & 0.007 & 0.003 & 0.000 & 0.005\\
+2008 & 0.003 & 0.022 & 0.042 & 0.042 & 0.042 & 0.023 & 0.017 & 0.013\\
+2009 & 0.003 & 0.026 & 0.049 & 0.049 & 0.049 & 0.027 & 0.019 & 0.015\\
+2010 & 0.004 & 0.032 & 0.059 & 0.059 & 0.059 & 0.033 & 0.023 & 0.019\\
+2011 & 0.004 & 0.034 & 0.064 & 0.064 & 0.064 & 0.036 & 0.025 & 0.020\\
+\addlinespace
+2012 & 0.003 & 0.024 & 0.046 & 0.046 & 0.046 & 0.025 & 0.018 & 0.015\\
+2013 & 0.004 & 0.028 & 0.053 & 0.053 & 0.053 & 0.029 & 0.021 & 0.017\\
+2014 & 0.004 & 0.031 & 0.059 & 0.059 & 0.059 & 0.032 & 0.023 & 0.019\\
+2015 & 0.003 & 0.027 & 0.050 & 0.050 & 0.050 & 0.028 & 0.020 & 0.016\\
+2016 & 0.003 & 0.026 & 0.049 & 0.049 & 0.049 & 0.027 & 0.019 & 0.015\\
+\addlinespace
+2017 & 0.003 & 0.027 & 0.051 & 0.051 & 0.051 & 0.028 & 0.020 & 0.016\\
+2018 & 0.002 & 0.020 & 0.037 & 0.037 & 0.037 & 0.020 & 0.014 & 0.012\\
+2019 & 0.003 & 0.023 & 0.044 & 0.044 & 0.044 & 0.024 & 0.017 & 0.014\\*
+\end{longtable}
+
+\end{document}
