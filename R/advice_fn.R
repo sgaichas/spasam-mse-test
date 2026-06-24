@@ -176,7 +176,7 @@ advice_fn <- function(em,
   hcr.opts <- if (is.null(hcr$hcr.opts)) list() else hcr$hcr.opts
   
   if (!hcr.type %in% c(1, 2, 3, 4)) {
-    stop("hcr$hcr.type must be one of 1, 2, or 3.", call. = FALSE)
+    stop("hcr$hcr.type must be one of 1, 2, 3, or 4.", call. = FALSE)
   }
   
   cat(paste0("\nHarvest Control Rule type ", hcr.type, "\n"))
@@ -441,6 +441,10 @@ advice_fn <- function(em,
     advice <- get_last_proj_catch(em_proj, pro.yr = pro.yr)
   }
   
+  ###########################################
+  #  MAFMC risk policy and ABC control rule
+  ###########################################
+  
   if (hcr.type == 4) {
     
     max_pstar <- if (is.null(hcr.opts$max_pstar)) 0.49 else hcr.opts$max_pstar
@@ -451,6 +455,8 @@ advice_fn <- function(em,
     BThresh_up  <- if (is.null(hcr.opts$BThresh_up)) 1.0 else hcr.opts$BThresh_up
     BThresh_low <- if (is.null(hcr.opts$BThresh_low)) 0.1 else hcr.opts$BThresh_low
     
+    OFL_CV <- if (is.null(hcr.opts$OFL_CV)) 1.0 else hcr.opts$OFL_CV
+    
     if (BThresh_low >= BThresh_up) {
       stop("BThresh_low must be smaller than BThresh_up.", call. = FALSE)
     }
@@ -458,29 +464,26 @@ advice_fn <- function(em,
     if (BThresh_up >= BThresh_high) {
       stop("BThresh_up must be smaller than BThresh_high.", call. = FALSE)
     }
-
-    
-    ############### UNMODIFIED BELOW HERE #######################
-    
+   
     if (isTRUE(use_FXSPR) && isTRUE(use_FMSY)) {
-      stop("For HCR type 3, choose only one reference path: use_FXSPR = TRUE or use_FMSY = TRUE.",
+      stop("For HCR type 4, choose only one reference path: use_FXSPR = TRUE or use_FMSY = TRUE.",
            call. = FALSE)
     }
     
     if (!isTRUE(use_FXSPR) && !isTRUE(use_FMSY)) {
-      stop("For HCR type 3, one of use_FXSPR or use_FMSY must be TRUE.",
+      stop("For HCR type 4, one of use_FXSPR or use_FMSY must be TRUE.",
            call. = FALSE)
     }
     
     if (isTRUE(use_FXSPR)) {
       
       if (is.null(em$rep$log_SSB_FXSPR)) {
-        stop("HCR type 3 with use_FXSPR = TRUE requires em$rep$log_SSB_FXSPR.",
+        stop("HCR type  with use_FXSPR = TRUE requires em$rep$log_SSB_FXSPR.",
              call. = FALSE)
       }
       
       if (is.null(em$rep$SSB)) {
-        stop("HCR type 3 requires em$rep$SSB.", call. = FALSE)
+        stop("HCR type 4 requires em$rep$SSB.", call. = FALSE)
       }
       
       SSB_x <- exp(em$rep$log_SSB_FXSPR[nrow(em$rep$log_SSB_FXSPR),
@@ -488,24 +491,31 @@ advice_fn <- function(em,
       SSB_t <- sum(em$rep$SSB[nrow(em$rep$SSB), ])
       ratio <- SSB_t / SSB_x
       
-      if (ratio >= BThresh_up) {
-        percent <- max_percent
-      } else if (ratio > BThresh_low) {
-        slope <- (max_percent - min_percent) / (BThresh_up - BThresh_low)
-        percent <- slope * (ratio - BThresh_low) + min_percent
+      if (ratio >= BThresh_high) {
+        pstar <- max_pstar
+      } else if (ratio > BThresh_up) {
+        slope <- (max_pstar - mid_ptar) / (BThresh_high - BThresh_up)
+        percent <- slope * (ratio - BThresh_up) + mid_pstar
+      } else if (ratio > BThresh_low) { 
+        slope <- (mid_pstar - min_pstar) / (BThresh_up - BThresh_low)
+        pstar <- slope * (ratio - BThresh_low) + min_pstar
       } else {
-        percent <- min_percent
+        pstar <- min_pstar
       }
       
-      cat(sprintf("SSB_t / SSB_XSPR = %.3f -> percentFXSPR = %.2f\n", ratio, percent))
+      OFL <- 
+        
+      ABC <- OFL * qlnorm(pstar, log(1), log(OFL_CV + 1))  
+      
+      cat(sprintf("SSB_t / SSB_XSPR = %.3f -> pstar = %.2f\n", ratio, pstar))
       
       proj_opts$use.last.F   <- FALSE
       proj_opts$use.avg.F    <- FALSE
-      proj_opts$use.FXSPR    <- TRUE
+      proj_opts$use.FXSPR    <- FALSE
       proj_opts$use.FMSY     <- FALSE
       proj_opts$proj.F       <- NULL
-      proj_opts$proj.catch   <- NULL
-      proj_opts$percentFXSPR <- as.numeric(percent)
+      proj_opts$proj.catch   <- as.numeric(ABC)
+      proj_opts$percentFXSPR <- NULL
       proj_opts$percentFMSY  <- NULL
     }
     
@@ -525,24 +535,31 @@ advice_fn <- function(em,
       SSB_t <- sum(em$rep$SSB[nrow(em$rep$SSB), ])
       ratio <- SSB_t / SSB_x
       
-      if (ratio >= BThresh_up) {
-        percent <- max_percent
-      } else if (ratio > BThresh_low) {
-        slope <- (max_percent - min_percent) / (BThresh_up - BThresh_low)
-        percent <- slope * (ratio - BThresh_low) + min_percent
+      if (ratio >= BThresh_high) {
+        pstar <- max_pstar
+      } else if (ratio > BThresh_up) {
+        slope <- (max_pstar - mid_ptar) / (BThresh_high - BThresh_up)
+        percent <- slope * (ratio - BThresh_up) + mid_pstar
+      } else if (ratio > BThresh_low) { 
+        slope <- (mid_pstar - min_pstar) / (BThresh_up - BThresh_low)
+        pstar <- slope * (ratio - BThresh_low) + min_pstar
       } else {
-        percent <- min_percent
+        pstar <- min_pstar
       }
       
-      cat(sprintf("SSB_t / SSB_MSY = %.3f -> percentFMSY = %.2f\n", ratio, percent))
+      OFL <- 
+        
+      ABC <- OFL * qlnorm(pstar, log(1), log(OFL_CV + 1))  
+      
+      cat(sprintf("SSB_t / SSB_XSPR = %.3f -> pstar = %.2f\n", ratio, pstar))
       
       proj_opts$use.last.F   <- FALSE
       proj_opts$use.avg.F    <- FALSE
       proj_opts$use.FXSPR    <- FALSE
-      proj_opts$use.FMSY     <- TRUE
+      proj_opts$use.FMSY     <- FALSE
       proj_opts$proj.F       <- NULL
-      proj_opts$proj.catch   <- NULL
-      proj_opts$percentFMSY  <- as.numeric(percent)
+      proj_opts$proj.catch   <- as.numeric(ABC)
+      proj_opts$percentFMSY  <- NULL
       proj_opts$percentFXSPR <- NULL
     }
     
