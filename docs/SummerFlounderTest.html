@@ -11,7 +11,7 @@
 
 <meta name="author" content="Sarah Gaichas" />
 
-<meta name="date" content="2026-06-23" />
+<meta name="date" content="2026-06-24" />
 
 <title>Summer Flounder Test</title>
 
@@ -352,13 +352,15 @@ display: none;
 
 <h1 class="title toc-ignore">Summer Flounder Test</h1>
 <h4 class="author">Sarah Gaichas</h4>
-<h4 class="date">2026-06-23</h4>
+<h4 class="date">2026-06-24</h4>
 
 </div>
 
 
 <div id="make-a-summer-flounder-model" class="section level1">
 <h1>Make a summer flounder model</h1>
+<div id="wham-from-asap" class="section level2">
+<h2>WHAM from ASAP?</h2>
 <p>Use an old ASAP file from the rec_measures MSE to get started. This
 thing has 20 indices. What could go wrong?</p>
 <p>Try reading the ASAP file into WHAM:</p>
@@ -383,6 +385,526 @@ wham::check_convergence(mod)</code></pre>
 <pre><code>## Max gradient parameter:F_pars</code></pre>
 <pre><code>## TMB:sdreport() was performed for this model, but it appears hessian was not invertible</code></pre>
 <p>We’ll need to simplify this</p>
+<p>What if the output SSB with noise is the biomass index input, or just
+use output NAA as input?</p>
+<p>This is the output NAA 1982-2019</p>
+<pre class="r"><code>sfNAA &lt;- readRDS(here::here(&quot;WHAMfits/sf-test/res_tables/stock_1_region_1_NAA_table.RDS&quot;))
+
+sfNAA</code></pre>
+<pre><code>##             1         2        3          4          5          6          7
+## 1982 81295.51 54611.657 28016.53  3616.8877  1248.3736  383.31028  186.99987
+## 1983 98291.50 61317.539 28239.34  9698.9717  1266.7645  437.25551  134.26132
+## 1984 44563.51 73209.024 25578.40  6650.5128  2311.8037  301.96054  104.23190
+## 1985 75818.59 33194.079 29923.37  5367.6378  1414.3963  491.72443   64.23005
+## 1986 78279.10 56472.755 13406.22  5977.8209  1085.1798  285.97415   99.42394
+## 1987 50689.15 58041.450 21447.95  2507.1300  1133.0430  205.70355   54.21014
+## 1988 12548.72 37643.553 22604.83  4156.9552   492.7498  222.71327   40.43505
+## 1989 36257.84  9251.715 12631.13  3017.0630   564.5638   66.94761   30.26214
+## 1990 43021.21 26455.385  3449.83  2182.9467   594.0285  112.28392   13.34504
+## 1991 46629.12 31363.972 11048.71   935.2735   689.6953  189.92451   35.99505
+## 1992 46003.17 34484.274 12716.33  2592.8595   229.9963  170.07435   46.86341
+## 1993 43749.74 32528.216 10992.43  2195.7413   579.5884   52.48964   38.99434
+## 1994 58588.53 31974.830 12525.38  2661.7537   585.3271  155.54500   14.10794
+## 1995 78809.10 42421.450 12139.99  2864.6191   716.2544  159.50887   42.50766
+## 1996 60675.22 60114.600 27760.16  3218.7923   782.1857  201.94592   45.09495
+## 1997 51584.21 46259.981 40358.14  9146.4859  1085.3644  270.14343   69.80348
+## 1998 55096.76 39553.657 32581.90 17409.3890  4028.6058  486.50999  121.29498
+## 1999 43673.51 42203.189 27547.70 13677.8186  7509.4222 1784.58715  216.19522
+## 2000 60190.34 33348.202 29414.77 12921.7738  6613.9913 3753.14808  894.74248
+## 2001 64836.56 45990.979 23079.82 12848.5816  5823.8238 3083.24790 1755.95780
+## 2002 68405.36 49626.154 32514.42 11930.9919  6880.5461 3240.19565 1724.23980
+## 2003 51030.75 52450.063 35732.29 17611.1291  6631.9314 3919.76352 1851.41978
+## 2004 73857.16 39086.208 37525.12 19314.8675  9802.2291 3802.61037 2255.68138
+## 2005 41231.14 56580.204 27969.59 19846.4340 10493.1963 5467.37274 2127.37405
+## 2006 50025.10 31553.908 40151.43 14397.9887 10525.8399 5740.32562 3001.63175
+## 2007 53555.10 38328.536 22786.44 23054.0951  8495.8178 6380.44334 3490.60525
+## 2008 64025.76 40977.772 27610.31 13562.8489 14143.7730 5380.30043 4055.21045
+## 2009 76499.82 49192.798 30596.07 19312.6218  8504.1580 8322.59284 3225.99812
+## 2010 53267.93 58745.111 36553.91 21162.2064 11884.3374 4937.16605 4938.17408
+## 2011 32643.90 40875.150 43369.24 24847.7596 12563.5338 6625.77070 2826.17978
+## 2012 36161.41 25043.864 30101.09 29142.5190 14187.2172 6661.19741 3615.61604
+## 2013 38631.70 27781.123 18672.67 20825.9486 17518.3581 7809.15941 3742.40881
+## 2014 42740.94 29662.253 20616.22 12742.5990 12166.8196 9199.02416 4199.17649
+## 2015 29505.69 32804.150 21949.10 14041.0374  7524.5952 6506.22545 5049.51365
+## 2016 34139.91 22659.646 24372.01 15037.2281  8259.6572 4078.48768 3606.52260
+## 2017 46572.62 26218.605 16852.01 16783.6603  9044.9705 4502.52937 2272.14412
+## 2018 59822.06 35761.464 19489.86 11708.0416 10527.3710 5301.38181 2699.18915
+## 2019 48430.82 45977.572 26775.95 13740.7614  7476.8298 6343.89925 3247.40768
+##               8+
+## 1982  328.039498
+## 1983  181.556825
+## 1984   75.719082
+## 1985   38.439392
+## 1986   20.837381
+## 1987   22.836922
+## 1988   15.190287
+## 1989    7.579127
+## 1990    7.558411
+## 1991    6.725507
+## 1992   10.557947
+## 1993   13.190135
+## 1994   14.061694
+## 1995    7.736994
+## 1996   14.224839
+## 1997   20.521160
+## 1998   40.645780
+## 1999   72.171988
+## 2000  144.904234
+## 2001  487.435215
+## 2002 1258.980742
+## 2003 1711.369813
+## 2004 2058.959343
+## 2005 2423.747631
+## 2006 2509.328184
+## 2007 3364.653131
+## 2008 4374.406992
+## 2009 5214.089574
+## 2010 5210.244863
+## 2011 6042.626813
+## 2012 5089.253072
+## 2013 5061.812892
+## 2014 4909.586060
+## 2015 5180.157481
+## 2016 5872.246912
+## 2017 5477.158330
+## 2018 4831.064929
+## 2019 4775.081365</code></pre>
+</div>
+<div id="from-original-risk-policy-mse-code" class="section level2">
+<h2>From original risk policy MSE code?</h2>
+<p>Or what if we started with John Wiedenmann’s summer flounder setup?
+This code is local, don’t have permission to post in a public repo</p>
+<p>Successfully compiled and ran his code for summer flounder.</p>
+<p>First build the operating model No changes made to the
+abc_opmodel.tpl or .dat files sent In terminal:</p>
+<pre><code>Sarahs-Air:summer_flounder_for_Sarah sarahgaichas$ admb abc_opmodel
+
+*** Parse: abc_opmodel.tpl
+tpl2cpp abc_opmodel || tpl2rem abc_opmodel
+
+*** Compile: abc_opmodel.cpp
+c++ -c -std=c++17 -O3 -D_USE_MATH_DEFINES -DUSE_ADMB_CONTRIBS -I. -I&quot;/usr/local/admb/include&quot; -I&quot;/usr/local/admb/include/contrib&quot; -oabc_opmodel.obj abc_opmodel.cpp
+
+*** Linking: abc_opmodel.obj 
+c++ -std=c++17 -O3 -oabc_opmodel abc_opmodel.obj &quot;/usr/local/admb/lib/libadmb-contrib-arm64-macos-clang.a&quot;
+
+Successfully built executable.</code></pre>
+<p>Also compile the estimation model in terminal:</p>
+<pre><code>Sarahs-Air:summer_flounder_for_Sarah sarahgaichas$ admb em_cf_selex
+*** Parse: em_cf_selex.tpl
+tpl2cpp em_cf_selex || tpl2rem em_cf_selex
+
+*** Compile: em_cf_selex.cpp
+c++ -c -std=c++17 -O3 -D_USE_MATH_DEFINES -DUSE_ADMB_CONTRIBS -I. -I&quot;/usr/local/admb/include&quot; -I&quot;/usr/local/admb/include/contrib&quot; -oem_cf_selex.obj em_cf_selex.cpp
+
+em_cf_selex.cpp:598:9: warning: assigning field to itself [-Wself-assign-field]
+                                        FL = FL;
+                                           ^
+em_cf_selex.cpp:605:9: warning: assigning field to itself [-Wself-assign-field]
+                                        FU = FU;
+                                           ^
+2 warnings generated.
+*** Linking: em_cf_selex.obj 
+c++ -std=c++17 -O3 -oem_cf_selex em_cf_selex.obj &quot;/usr/local/admb/lib/libadmb-contrib-arm64-macos-clang.a&quot;
+
+Successfully built executable.</code></pre>
+<p>Run the om</p>
+<pre><code>Sarahs-Air:summer_flounder_for_Sarah sarahgaichas$ ./abc_opmodel
+rm: assessment_estimates.txt: No such file or directory
+rm: terminal_estimates_sf.txt: No such file or directory
+rm: obs_est_sf.txt: No such file or directory
+rm: time_varying_params.txt: No such file or directory
+mr= 1 sa interval = 2 data lag = 1 i= 1 Seed 13 cr = 2 remainder  = 0
+mr= 1 sa interval = 2 data lag = 1 i= 2 Seed 14 cr = 2 remainder  = 0
+mr= 1 sa interval = 2 data lag = 1 i= 3 Seed 16 cr = 2 remainder  = 0
+mr= 1 sa interval = 2 data lag = 1 i= 4 Seed 19 cr = 2 remainder  = 0
+mr= 1 sa interval = 2 data lag = 1 i= 5 Seed 23 cr = 2 remainder  = 0
+mr= 1 sa interval = 2 data lag = 1 i= 6 Seed 28 cr = 2 remainder  = 0
+mr= 1 sa interval = 2 data lag = 1 i= 7 Seed 34 cr = 2 remainder  = 0
+mr= 1 sa interval = 2 data lag = 1 i= 8 Seed 41 cr = 2 remainder  = 0
+mr= 1 sa interval = 2 data lag = 1 i= 9 Seed 49 cr = 2 remainder  = 0
+mr= 1 sa interval = 2 data lag = 1 i= 10 Seed 58 cr = 2 remainder  = 0
+mr= 1 sa interval = 2 data lag = 1 i= 11 Seed 68 cr = 2 remainder  = 0
+mr= 1 sa interval = 2 data lag = 1 i= 12 Seed 79 cr = 2 remainder  = 0
+mr= 1 sa interval = 2 data lag = 1 i= 13 Seed 91 cr = 2 remainder  = 0
+mr= 1 sa interval = 2 data lag = 1 i= 14 Seed 104 cr = 2 remainder  = 0
+mr= 1 sa interval = 2 data lag = 1 i= 15 Seed 118 cr = 2 remainder  = 0
+mr= 1 sa interval = 2 data lag = 1 i= 16 Seed 133 cr = 2 remainder  = 0
+mr= 1 sa interval = 2 data lag = 1 i= 17 Seed 149 cr = 2 remainder  = 0
+mr= 1 sa interval = 2 data lag = 1 i= 18 Seed 166 cr = 2 remainder  = 0
+mr= 1 sa interval = 2 data lag = 1 i= 19 Seed 184 cr = 2 remainder  = 0
+mr= 1 sa interval = 2 data lag = 1 i= 20 Seed 203 cr = 2 remainder  = 0
+Model finished!</code></pre>
+<p>Files produced:
+/Users/sarahgaichas/Documents/Work/MAFMCindicators/summer_flounder_for_Sarah/output_for_cyrus.txt
+/Users/sarahgaichas/Documents/Work/MAFMCindicators/summer_flounder_for_Sarah/performance_measures_sf.txt
+/Users/sarahgaichas/Documents/Work/MAFMCindicators/summer_flounder_for_Sarah/em_cf_selex.log
+/Users/sarahgaichas/Documents/Work/MAFMCindicators/summer_flounder_for_Sarah/junk.txt
+/Users/sarahgaichas/Documents/Work/MAFMCindicators/summer_flounder_for_Sarah/assessment_estimates.txt
+/Users/sarahgaichas/Documents/Work/MAFMCindicators/summer_flounder_for_Sarah/term_est.txt
+/Users/sarahgaichas/Documents/Work/MAFMCindicators/summer_flounder_for_Sarah/em_cf_selex.rep
+/Users/sarahgaichas/Documents/Work/MAFMCindicators/summer_flounder_for_Sarah/em_cf_selex.bar
+/Users/sarahgaichas/Documents/Work/MAFMCindicators/summer_flounder_for_Sarah/em_cf_selex.par
+/Users/sarahgaichas/Documents/Work/MAFMCindicators/summer_flounder_for_Sarah/fmin.log
+/Users/sarahgaichas/Documents/Work/MAFMCindicators/summer_flounder_for_Sarah/em_cf_selex.dat
+/Users/sarahgaichas/Documents/Work/MAFMCindicators/summer_flounder_for_Sarah/BRPs_sf.txt
+/Users/sarahgaichas/Documents/Work/MAFMCindicators/summer_flounder_for_Sarah/performance_measures_head_sf.txt</p>
+<p>This is the dat file input that goes with the tpl file</p>
+<pre class="r"><code># number of model iterations
+20
+#random number seed
+13
+# number of data lag runs to do
+1
+# data lag values
+1 2 3 4 
+# number of SA intervals to explore
+1
+# SA intervals
+2 3 5 7 5 7 10
+# number of years to model
+66
+# year when fishing begins 
+1
+# first year of data collection 
+1
+# first year of an assessment (from 1982 to 2017)
+36
+# Number of control rules to explore
+1
+# Life history index
+2
+# number of age classes
+1
+# number of age classes
+8
+# steepness
+0.9
+# R0
+53569.
+#S0
+120000.
+#M
+0.26 0.26 0.26 0.25 0.25 0.25 0.25 0.24
+# spawn fraction
+0.83
+# NAA
+81955   56043   25826   3204    1102    370 222 252
+102427  61401   28486   7718    1098    408 149 178
+46954   75541   25145   5436    1840    292 123 87
+78263   34603   29969   4176    1091    420 77  52
+81397   57712   13745   4815    811 242 109 31
+53988   59653   21238   1979    862 167 58  33
+12474   39674   22770   3300    374 186 42  22
+36963   9098    13316   2417    427 58  35  11
+44019   26825   3426    2009    442 92  15  12
+47704   31915   10988   791 591 146 34  9
+47264   34992   12775   2154    190 159 45  13
+43928   33221   10976   1811    434 45  44  16
+58403   31857   12529   2199    458 123 15  18
+78348   42085   12141   2528    577 137 41  10
+59520   59020   26897   3740    445 106 30  12
+52374   44901   38815   9819    880 109 31  13
+54518   39840   31214   18434   3497    321 45  19
+44100   41416   27383   14465   6378    1247    132 27
+60551   33485   28640   14065   6151    2824    605 79
+64979   45942   22959   13869   5376    2444    1263    311
+67860   49508   32263   12752   6661    2674    1306    855
+50131   51834   35494   18696   6424    3439    1466    1221
+71270   38248   36908   20554   9533    3374    1922    1540
+40634   54397   27325   21199   10250   4882    1841    1947
+48153   30983   38583   15435   10373   5171    2624    2107
+52646   36801   22377   23528   8511    5865    3069    2870
+62460   40214   26566   14106   13919   5188    3708    3810
+73747   47752   29853   18451   8993    7920    3029    4616
+51331   56339   35276   20465   11526   5006    4541    4663
+31296   39164   41305   23746   12433   6189    2786    5429
+35187   23863   28729   27637   14014   6294    3239    4678
+36719   26860   17651   19665   16878   7311    3370    4560
+42271   27983   19726   11882   11664   8365    3739    4393
+29833   32228   20540   13304   7146    5982    4436    4623
+35853   22759   23727   13886   7981    3672    3169    5123
+42415   27346   16770   16119   8398    4096    1941    4742
+# Fmax
+0.948   1.396   1.535   1.568   1.678   1.602   1.983   1.631   1.205   1.37    1.694   1.348   1.341   1.488   1.197   0.782   0.811   0.605   0.712   0.483   0.436   0.424   0.446   0.465   0.345   0.275   0.314   0.336   0.372   0.431   0.401   0.452   0.418   0.416   0.417   0.334
+# Ctot
+21408   30425   30470   26264   24837   23577   24598   11231   9028    12914   15985   13347   15016   12482   14734   13867   17079   15138   20146   15695   16473   19224   20958   19293   17868   14773   12909   14307   15408   17487   16163   17483   15275   12498   11796   9611
+#WAA
+0.244   0.419   0.716   1.075   1.257   1.495   2.567   3.351
+0.251   0.398   0.632   1.046   1.5 2.163   3.456   3.886
+0.29    0.429   0.613   1.109   1.726   2.297   2.671   4.721
+0.256   0.454   0.668   1.16    1.739   1.994   3.31    3.382
+0.263   0.446   0.651   1.14    1.941   2.862   3.378   3.344
+0.319   0.462   0.624   1.13    1.738   2.486   3.888   3.762
+0.135   0.456   0.689   1.04    1.474   2.248   2.408   2.709
+0.214   0.421   0.811   1.162   1.538   2.143   3.024   4.305
+0.166   0.441   0.701   1.186   1.812   2.519   2.975   3.66
+0.183   0.417   0.718   1.226   1.392   2.687   2.302   4.456
+0.208   0.482   0.689   1.478   1.671   1.865   2.816   4.49
+0.31    0.489   0.598   1.349   2.092   2.763   3.399   3.703
+0.228   0.532   0.675   1.058   1.643   2.645   3.624   4.094
+0.265   0.496   0.559   1.076   1.629   2.341   2.727   4.914
+0.204   0.448   0.633   0.862   1.244   2.257   2.609   3.429
+0.221   0.522   0.643   0.842   1.324   2.444   2.745   3.815
+0.156   0.34    0.583   0.876   1.423   1.944   2.736   3.471
+0.094   0.567   0.784   1.079   1.783   2.702   2.645   3.025
+0.135   0.536   0.766   0.97    1.454   2.171   2.611   3.736
+0.192   0.438   0.723   0.956   1.382   2.107   2.734   3.744
+0.171   0.473   0.739   1.026   1.526   2.072   2.794   3.357
+0.307   0.49    0.72    0.969   1.361   1.788   2.409   3.183
+0.208   0.425   0.674   0.922   1.187   1.512   1.897   2.452
+0.156   0.453   0.665   0.964   1.271   1.661   2.24    3.138
+0.167   0.387   0.681   0.941   1.279   1.734   2.22    2.831
+0.18    0.372   0.592   0.87    1.162   1.559   1.92    2.507
+0.167   0.348   0.583   0.837   1.084   1.497   1.943   2.703
+0.169   0.316   0.503   0.758   1.047   1.398   1.899   2.734
+0.182   0.327   0.495   0.676   0.998   1.501   1.864   2.457
+0.202   0.335   0.568   0.742   1.022   1.473   1.845   2.328
+0.180   0.340   0.548   0.777   1.063   1.486   1.894   2.546
+0.180   0.340   0.548   0.777   1.063   1.486   1.894   2.546
+0.180   0.340   0.548   0.777   1.063   1.486   1.894   2.546
+0.180   0.340   0.548   0.777   1.063   1.486   1.894   2.546
+0.148   0.358   0.633   0.834   1.053   1.366   1.606   1.964
+0.148   0.358   0.633   0.834   1.053   1.366   1.606   1.964
+0.148   0.358   0.633   0.834   1.053   1.366   1.606   1.964
+#selex AA
+0.031   0.440   1.000   0.866   0.785   0.692   0.679   0.865
+0.032   0.453   1.000   0.848   0.769   0.681   0.679   0.862
+0.029   0.433   1.000   0.883   0.800   0.702   0.681   0.869
+0.029   0.423   1.000   0.886   0.801   0.703   0.682   0.870
+0.030   0.441   1.000   0.876   0.793   0.698   0.681   0.868
+0.030   0.439   1.000   0.884   0.800   0.703   0.682   0.870
+0.028   0.420   1.000   0.905   0.818   0.715   0.682   0.872
+0.037   0.440   1.000   0.888   0.788   0.686   0.641   0.820
+0.051   0.525   1.000   0.808   0.710   0.627   0.608   0.772
+0.036   0.479   1.000   0.861   0.776   0.683   0.667   0.849
+0.055   0.531   1.000   0.799   0.696   0.612   0.590   0.749
+0.045   0.530   1.000   0.835   0.746   0.659   0.645   0.818
+0.051   0.526   1.000   0.811   0.714   0.629   0.612   0.776
+0.015   0.126   0.616   1.000   0.971   0.848   0.807   0.702
+0.018   0.133   0.625   1.000   0.966   0.820   0.789   0.710
+0.018   0.133   0.620   1.000   0.969   0.799   0.777   0.708
+0.018   0.142   0.628   1.000   0.963   0.790   0.772   0.707
+0.025   0.180   0.671   1.000   0.934   0.782   0.764   0.706
+0.022   0.164   0.653   1.000   0.945   0.779   0.763   0.706
+0.025   0.193   0.679   1.000   0.928   0.778   0.764   0.694
+0.021   0.167   0.656   1.000   0.943   0.805   0.780   0.697
+0.026   0.189   0.675   1.000   0.929   0.783   0.764   0.696
+0.022   0.170   0.659   1.000   0.939   0.798   0.774   0.700
+0.024   0.178   0.669   1.000   0.933   0.798   0.774   0.699
+0.026   0.188   0.681   1.000   0.928   0.788   0.768   0.701
+0.033   0.240   0.731   1.000   0.891   0.760   0.745   0.698
+0.025   0.121   0.334   0.637   1.000   0.917   0.895   0.659
+0.027   0.128   0.351   0.658   1.000   0.911   0.887   0.658
+0.030   0.134   0.366   0.667   1.000   0.903   0.879   0.651
+0.026   0.116   0.329   0.643   1.000   0.923   0.905   0.664
+0.025   0.105   0.297   0.606   1.000   0.935   0.920   0.668
+0.027   0.108   0.301   0.602   1.000   0.929   0.916   0.664
+0.026   0.117   0.321   0.617   1.000   0.919   0.902   0.658
+0.026   0.111   0.315   0.627   1.000   0.928   0.911   0.666
+0.026   0.108   0.305   0.607   1.000   0.930   0.914   0.664
+0.027   0.129   0.344   0.638   1.000   0.907   0.883   0.650
+0.026   0.118   0.326   0.630   1.000   0.920   0.901   0.660
+# proportion mature
+0.26 0.78 0.97 1.00 1.00 1.00 1.00 1.00
+# age at 50% selex in survey
+0.5
+# slope of survey selex
+1.0
+#SPR limit % (the overfishing limit)
+0.35
+# SPR target %
+0.35
+# Survey q 
+0.005
+# s.d. of q random walk
+0.07 0.07
+# ESS
+200 50
+# M_sigma
+0.001
+# Correlation in M
+0.01 0.3
+# relative bounds for M
+0.5 1.5
+# selex sigma
+0.001
+# selex correlation
+0.01 0.3
+# relative bounds for sf50
+0.75 1.25
+# Catch PSE
+0.2
+# Index PSE
+0.3 0.5
+# correlation in R 
+0.0 0.44
+# s.d. of recruitment deviations
+#0.77 1.25
+0.5 0.5
+#sel_blocks
+3
+# sel_yrs
+14 27
+# sel obs
+0.037   0.468   1.000   0.858   0.769   0.676   0.656   0.835
+0.023   0.170   0.659   1.000   0.941   0.795   0.772   0.702
+0.026   0.118   0.326   0.630   1.000   0.920   0.901   0.660
+# Pstar buffers from 0.01 to 0.5, CV = 0.6, 1.0, 1.2
+0.2752735
+0.3201933
+0.3524225
+0.3787881
+0.4016827
+0.4222565
+0.441161
+0.4588048
+0.475463
+0.4913311
+0.5065533
+0.5212396
+0.5354763
+0.5493326
+0.5628648
+0.5761197
+0.5891367
+0.6019494
+0.6145869
+0.6270745
+0.6394345
+0.6516868
+0.6638492
+0.675938
+0.6879677
+0.6999521
+0.7119036
+0.723834
+0.7357543
+0.747675
+0.7596059
+0.7715567
+0.7835365
+0.7955543
+0.8076187
+0.8197384
+0.8319217
+0.844177
+0.8565128
+0.8689373
+0.8814591
+0.8940867
+0.9068286
+0.9196939
+0.9326914
+0.9458306
+0.9591209
+0.9725723
+0.9861951
+1.000000
+0.230142
+0.2733735
+0.3049226
+0.3310334
+0.353913
+0.3746288
+0.3937878
+0.4117723
+0.4288407
+0.4451769
+0.4609172
+0.4761658
+0.4910047
+0.5054997
+0.5197047
+0.5336647
+0.5474177
+0.5609961
+0.5744281
+0.5877386
+0.6009493
+0.6140799
+0.6271482
+0.6401703
+0.653161
+0.666134
+0.6791022
+0.6920778
+0.705072
+0.7180958
+0.7311599
+0.7442742
+0.7574486
+0.770693
+0.7840167
+0.7974293
+0.81094
+0.8245585
+0.838294
+0.8521562
+0.8661547
+0.8802994
+0.8946005
+0.9090682
+0.9237133
+0.9385467
+0.95358
+0.9688249
+0.984294
+1.000000
+0.1441629
+0.1808915
+0.2089076
+0.2328079
+0.2542517
+0.274053
+0.2926796
+0.3104294
+0.3275051
+0.3440523
+0.3601799
+0.375972
+0.3914952
+0.4068036
+0.421942
+0.4369483
+0.4518547
+0.4666894
+0.4814771
+0.49624
+0.5109979
+0.5257692
+0.5405704
+0.5554174
+0.5703246
+0.5853062
+0.6003753
+0.6155449
+0.6308274
+0.646235
+0.6617797
+0.6774735
+0.6933282
+0.7093558
+0.7255681
+0.7419774
+0.7585959
+0.7754363
+0.7925114
+0.8098346
+0.8274194
+0.84528
+0.8634311
+0.8818881
+0.9006668
+0.9197839
+0.9392569
+0.9591042
+0.9793451
+1.0
+
+# End of file value
+12345</code></pre>
+</div>
 </div>
 
 
