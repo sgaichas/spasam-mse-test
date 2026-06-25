@@ -302,7 +302,7 @@ assess.interval <- 1
 # it can, we need to fill the catch vector with assess.interval catches by projecting OFL based on ABC for each previous year
 # the advice_fn needs to loop over years for this one?
 
-mods[[3]] = loop_through_fn(om = om_with_data,
+mods[[4]] = loop_through_fn(om = om_with_data,
                             em_info = info,
                             random = random,
                             sel_em = sel_em,

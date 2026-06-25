@@ -481,7 +481,7 @@ advice_fn <- function(em,
     if (isTRUE(use_FXSPR)) {
       
       if (is.null(em$rep$log_SSB_FXSPR)) {
-        stop("HCR type  with use_FXSPR = TRUE requires em$rep$log_SSB_FXSPR.",
+        stop("HCR type 4 with use_FXSPR = TRUE requires em$rep$log_SSB_FXSPR.",
              call. = FALSE)
       }
       
@@ -507,8 +507,9 @@ advice_fn <- function(em,
       }
       
       # How to get the OFL
-      OFL <- sum(em$rep$pred_catch[nrow(em$rep$pred_catch), ])
-      #OFL <- tail(apply(mod.proj$rep$pred_catch,1,sum),projyr)[i+1]
+      ofl_proj <- project_wham(em, proj.opts = list(use.FXSPR = TRUE, n.yrs=1), MakeADFun.silent = TRUE)
+      #OFL <- SSB_x * exp(em$rep$log_FXSPR[length(em$rep$log_FXSPR)])
+      OFL <- tail(apply(ofl_proj$rep$pred_catch,1,sum),1)  #[i+1]
       
       ABC <- OFL * qlnorm(pstar, log(1), log(OFL_CV + 1))  
       
@@ -528,12 +529,12 @@ advice_fn <- function(em,
     if (isTRUE(use_FMSY)) {
 
       if (is.null(em$rep$log_SSB_MSY)) {
-        stop("HCR type 3 with use_FMSY = TRUE requires em$rep$log_SSB_MSY.",
+        stop("HCR type 4 with use_FMSY = TRUE requires em$rep$log_SSB_MSY.",
              call. = FALSE)
       }
 
       if (is.null(em$rep$SSB)) {
-        stop("HCR type 3 requires em$rep$SSB.", call. = FALSE)
+        stop("HCR type 4 requires em$rep$SSB.", call. = FALSE)
       }
 
       SSB_x <- exp(em$rep$log_SSB_MSY[nrow(em$rep$log_SSB_MSY),
