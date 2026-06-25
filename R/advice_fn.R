@@ -24,7 +24,7 @@
 #'         \item \code{use_FMSY}, \code{percentFMSY}
 #'         \item \code{avg_yrs}, \code{cont.M.re}, \code{cont.move.re}
 #'         \item \code{max_percent}, \code{min_percent},
-#'           \code{BThresh_up}, \code{BThresh_low} (for HCR 3)
+#'           \code{BThresh_up}, \code{BThresh_low} (for HCR 3 and 4)
 #'         \item \code{max_pstar}, \code{mid_pstar}, \code{min_pstar},
 #'           \code{BThresh_high}, \code{OFL_CV} (for HCR 4)
 #'       }}
@@ -73,7 +73,7 @@
 #' advice) is calculated using the resulting pstar as the percentile of OFL 
 #' assuming that the OFL is lognormally distributed with CV \code{OFL_CV}. Default
 #' values are 0.0, 0.45, and 0.49 for min, mid, and max pstar, 0.1, 1.0, and 1.5
-#' time B_msy for min, up, and high B thresholds, and 1.0 for OFL CV.
+#' times B_msy for min, up, and high B thresholds, and 1.0 for OFL CV.
 #' 
 #'
 #' @return A matrix of projected catch advice for \code{pro.yr} years.
@@ -477,8 +477,8 @@ advice_fn <- function(em,
     #        call. = FALSE)
     # }
     # 
-    # # may not need to distinguishj
-    # if (isTRUE(use_FXSPR)) {
+    # # may not need to distinguish
+    if (isTRUE(use_FXSPR)) {
       
       if (is.null(em$rep$log_SSB_FXSPR)) {
         stop("HCR type  with use_FXSPR = TRUE requires em$rep$log_SSB_FXSPR.",
@@ -497,8 +497,8 @@ advice_fn <- function(em,
       if (ratio >= BThresh_high) {
         pstar <- max_pstar
       } else if (ratio > BThresh_up) {
-        slope <- (max_pstar - mid_ptar) / (BThresh_high - BThresh_up)
-        percent <- slope * (ratio - BThresh_up) + mid_pstar
+        slope <- (max_pstar - mid_pstar) / (BThresh_high - BThresh_up)
+        pstar <- slope * (ratio - BThresh_up) + mid_pstar
       } else if (ratio > BThresh_low) { 
         slope <- (mid_pstar - min_pstar) / (BThresh_up - BThresh_low)
         pstar <- slope * (ratio - BThresh_low) + min_pstar
@@ -522,54 +522,54 @@ advice_fn <- function(em,
       proj_opts$proj.catch   <- as.numeric(ABC)
       proj_opts$percentFXSPR <- NULL
       proj_opts$percentFMSY  <- NULL
-    # }
-    # 
-    # # may not need to distinguishj
-    # if (isTRUE(use_FMSY)) {
-    #   
-    #   if (is.null(em$rep$log_SSB_MSY)) {
-    #     stop("HCR type 3 with use_FMSY = TRUE requires em$rep$log_SSB_MSY.",
-    #          call. = FALSE)
-    #   }
-    #   
-    #   if (is.null(em$rep$SSB)) {
-    #     stop("HCR type 3 requires em$rep$SSB.", call. = FALSE)
-    #   }
-    #   
-    #   SSB_x <- exp(em$rep$log_SSB_MSY[nrow(em$rep$log_SSB_MSY),
-    #                                   ncol(em$rep$log_SSB_MSY)])
-    #   SSB_t <- sum(em$rep$SSB[nrow(em$rep$SSB), ])
-    #   ratio <- SSB_t / SSB_x
-    #   
-    #   if (ratio >= BThresh_high) {
-    #     pstar <- max_pstar
-    #   } else if (ratio > BThresh_up) {
-    #     slope <- (max_pstar - mid_ptar) / (BThresh_high - BThresh_up)
-    #     percent <- slope * (ratio - BThresh_up) + mid_pstar
-    #   } else if (ratio > BThresh_low) { 
-    #     slope <- (mid_pstar - min_pstar) / (BThresh_up - BThresh_low)
-    #     pstar <- slope * (ratio - BThresh_low) + min_pstar
-    #   } else {
-    #     pstar <- min_pstar
-    #   }
-    #   
-    #   # How to get the OFL
-    #   OFL <- sum(em$rep$pred_catch[nrow(em$rep$pred_catch), ])
-    #   #OFL <- tail(apply(mod.proj$rep$pred_catch,1,sum),projyr)[i+1]
-    #     
-    #   ABC <- OFL * qlnorm(pstar, log(1), log(OFL_CV + 1))  
-    #   
-    #   cat(sprintf("SSB_t / SSB_XSPR = %.3f -> pstar = %.2f\n", ratio, pstar))
-    #   
-    #   proj_opts$use.last.F   <- FALSE
-    #   proj_opts$use.avg.F    <- FALSE
-    #   proj_opts$use.FXSPR    <- FALSE
-    #   proj_opts$use.FMSY     <- FALSE
-    #   proj_opts$proj.F       <- NULL
-    #   proj_opts$proj.catch   <- as.numeric(ABC)
-    #   proj_opts$percentFMSY  <- NULL
-    #   proj_opts$percentFXSPR <- NULL
-    # }
+     }
+     
+    # # may not need to distinguish
+    if (isTRUE(use_FMSY)) {
+
+      if (is.null(em$rep$log_SSB_MSY)) {
+        stop("HCR type 3 with use_FMSY = TRUE requires em$rep$log_SSB_MSY.",
+             call. = FALSE)
+      }
+
+      if (is.null(em$rep$SSB)) {
+        stop("HCR type 3 requires em$rep$SSB.", call. = FALSE)
+      }
+
+      SSB_x <- exp(em$rep$log_SSB_MSY[nrow(em$rep$log_SSB_MSY),
+                                      ncol(em$rep$log_SSB_MSY)])
+      SSB_t <- sum(em$rep$SSB[nrow(em$rep$SSB), ])
+      ratio <- SSB_t / SSB_x
+
+      if (ratio >= BThresh_high) {
+        pstar <- max_pstar
+      } else if (ratio > BThresh_up) {
+        slope <- (max_pstar - mid_pstar) / (BThresh_high - BThresh_up)
+        pstar <- slope * (ratio - BThresh_up) + mid_pstar
+      } else if (ratio > BThresh_low) {
+        slope <- (mid_pstar - min_pstar) / (BThresh_up - BThresh_low)
+        pstar <- slope * (ratio - BThresh_low) + min_pstar
+      } else {
+        pstar <- min_pstar
+      }
+
+      # How to get the OFL
+      OFL <- sum(em$rep$pred_catch[nrow(em$rep$pred_catch), ])
+      #OFL <- tail(apply(mod.proj$rep$pred_catch,1,sum),projyr)[i+1]
+
+      ABC <- OFL * qlnorm(pstar, log(1), log(OFL_CV + 1))
+
+      cat(sprintf("SSB_t / SSB_XSPR = %.3f -> pstar = %.2f\n", ratio, pstar))
+
+      proj_opts$use.last.F   <- FALSE
+      proj_opts$use.avg.F    <- FALSE
+      proj_opts$use.FXSPR    <- FALSE
+      proj_opts$use.FMSY     <- FALSE
+      proj_opts$proj.F       <- NULL
+      proj_opts$proj.catch   <- as.numeric(ABC)
+      proj_opts$percentFMSY  <- NULL
+      proj_opts$percentFXSPR <- NULL
+    }
     
     validate_single_fspec(proj_opts, hcr.type = hcr.type)
     
