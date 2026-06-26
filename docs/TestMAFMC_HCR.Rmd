@@ -288,6 +288,122 @@ Still the same results, good.
 
 Now add HCR 4
 
+## Some notes on HCR 4
+
+The MAFMC risk policy and control rule require estimation both of stock B status and OFL based on an F reference point to estimate ABC
+
+The Mid-Atlantic ABC control rule is based on the MAFMC risk policy for probability of overfishing, pstar, combined with the uncertainty in the OFL, OFL CV. It was updated in 2020 to include higher risk tolerance at high stock size. 
+
+```{r MAFMCriskpolicy, fig.asp = 0.7}
+
+riskpol <- data.frame(Bfrac = c(0, 0.1, 1.0, 1.5, 2.5),
+                      Current = c(0, 0, 0.45, 0.49, 0.49),
+                      Pre2020 = c(0, 0, 0.4, 0.4, 0.4)
+)
+
+riskpol <- riskpol %>%
+  pivot_longer(-Bfrac, names_to = "pstar")
+
+p1 <- ggplot2::ggplot(riskpol, aes(x=Bfrac, y=value, linetype = pstar)) +
+  geom_path(show.legend = TRUE) +
+  theme_minimal() +
+  xlab("B/Bmsy") +
+  ylab("p*") +
+  labs(linetype = "Policy")+
+  theme(legend.position="bottom")
+
+
+#print(p1, vp=grid::viewport(gp=grid::gpar(cex=1.5)))
+```
+
+
+```{r OFLCVtoABC, fig.asp = 0.7}
+
+ABCprop <- data.frame(Bfrac = seq(0, 2.5, 0.01)) %>%
+  dplyr::mutate(pstar = case_when(Bfrac <= 0.1 ~ 0,
+                                  Bfrac > 0.1 & Bfrac <= 1.0 ~ (Bfrac-0.1)*((0.45-0)/(1-0.1)) ,
+                                  Bfrac > 1.0 & Bfrac <= 1.5 ~ (Bfrac-1.0)*((0.49-0.45)/(1.5-1))+0.45,
+                                  Bfrac > 1.5 ~ 0.49)) %>%
+  dplyr::mutate("CV=60%" = qlnorm(pstar, log(1), log(0.60 + 1)),
+                "CV=100%" = qlnorm(pstar, log(1), log(1.00 + 1)),
+                "CV=150%" = qlnorm(pstar, log(1), log(1.50 + 1))) %>%
+  pivot_longer(-c(Bfrac, pstar), names_to = "CVlevel")
+                       
+
+p2 <- ggplot2::ggplot(ABCprop, aes(x=Bfrac, y=value, colour=CVlevel)) +
+  geom_line()+  
+  theme_minimal() +
+  xlab("B/Bmsy") +
+  ylab("ABC/OFL proportion") +
+  labs(colour = "OFL CV") +
+  theme(legend.position="bottom")
+
+#print(p2, vp=grid::viewport(gp=grid::gpar(cex=1.5)))
+  
+```
+
+```{r, fig.asp = 0.5}
+library(patchwork)
+p1 + p2
+```
+
+In WHAM the ABC can be used in projection as an input catch, but it is needed for each projection year, requiring multiple iterative projections.
+
+My first attempts worked for 1 year projections but we would like more flexibility.
+
+The NEFSC has some [code that does multiyear projections for WHAM models](https://github.com/NEFSC/READ-PDB-COLLABORATIONS/blob/main/Reference-Points-and-Projections/P-star.basic.model.R) which was generalized for use here.
+
+```{r eval=FALSE}
+# from https://github.com/NEFSC/READ-PDB-COLLABORATIONS/blob/main/Reference-Points-and-Projections/P-star.basic.model.R
+
+# there are separate functions to estimate Pstar and ABC 
+# this is the loop to fill a catch vector for projection in WHAM
+
+# Specify the model and projection years
+  model.years <- mod$years
+  proj.years <- c((tail(model.years,1)+1):(tail(model.years,1)+projyr))
+  
+  # Empty variables to collect catch and pstar values
+  catch.proj <- rep(0,projyr)
+  
+  # Catch in the first year of projections is specified
+  catch.proj[1] <- catch.year1
+  
+  if(projyr>1)
+  {  for(i in 1:(projyr-1))
+    {
+      # Tell WHAM to do projection based on catch in first i years ('5') and Fmsy proxy ('3') in following years
+      proj_F_opt <- c(rep(5,i),rep(3,projyr-i))
+      mod.proj <- project_wham(mod, proj.opts = list(n.yrs = projyr,proj_F_opt = proj_F_opt, proj_Fcatch = catch.proj), check.version = F)
+      
+      # Get OFL, SSB, and SSB ratio (relative to SSBMSY)
+      ofl <- tail(apply(mod.proj$rep$pred_catch,1,sum),projyr)[i+1]
+      ssb <- tail(apply(mod.proj$rep$SSB,1,sum),projyr)[i]
+      ssbratio <- ssb/SSBmsy
+      
+      # Calculate catch from p* code
+      catch <- ABC(ofl,ssbratio,CV)
+      
+      # As long as its not the terminal year, add the abc catch to catch vector and repeat
+      if(i<projyr)
+      {
+        catch.proj[i+1] <- catch
+        if(!is.null(avg.abc)) catch.proj[i+1] <- avg.abc
+      }
+    }
+  }
+  
+  # Conduct one last projection to get F and SSB resultant from final ABC
+  proj_F_opt <- c(rep(5,projyr))
+  mod.proj <- project_wham(mod, proj.opts = list(n.yrs = projyr,proj_F_opt = proj_F_opt, proj_Fcatch = catch.proj), check.version = F)
+
+  # Return the final projection model
+  return(mod.proj)
+```
+
+The new `advice_fun.R` with the MAFMC risk policy plus HCR is here: https://github.com/sgaichas/SPASAM.MSE/blob/main/R/advice_fn.R
+
+
 ### EM4 is all one area for stock and fleets, MAFMC risk policy and HCR
 
 ```{r}
@@ -297,7 +413,7 @@ hcr$hcr.opts <- list(use_FXSPR = TRUE) #defaults
 
 # Error in `advice_fn()`: length of proj.catch is not = number of projection years
 # see if it can do one year projection first
-assess.interval <- 1
+#assess.interval <- 1
 
 # it can, we need to fill the catch vector with assess.interval catches by projecting OFL based on ABC for each previous year
 # the advice_fn needs to loop over years for this one?
@@ -320,3 +436,50 @@ mods[[4]] = loop_through_fn(om = om_with_data,
                             seed = 123)
 ```
 
+## Compare performance with MAFMC HCR
+
+```{r}
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+
+yrs <- 1:23
+
+# Create dataframe
+df <- data.frame(
+  Year = yrs,
+  SSB_EM1 = mods[[1]]$om$rep$SSB[1:23,1],
+  SSB_EM2 = mods[[2]]$om$rep$SSB[1:23,1],
+  SSB_EM3 = mods[[3]]$om$rep$SSB[1:23,1],
+  SSB_EM4 = mods[[4]]$om$rep$SSB[1:23,1],
+  Catch_EM1 = mods[[1]]$om$rep$pred_catch[1:23,1],
+  Catch_EM2 = mods[[2]]$om$rep$pred_catch[1:23,1],
+  Catch_EM3 = mods[[3]]$om$rep$pred_catch[1:23,1],
+  Catch_EM4 = mods[[4]]$om$rep$pred_catch[1:23,1]
+)
+
+# Convert to long format
+plot_df <- df |>
+  pivot_longer(-Year) |>
+  separate(name, into = c("Variable","Model"), sep = "_")
+
+plot_df$Model <- factor(plot_df$Model,
+                        levels = c("EM1","EM2","EM3", "EM4"),
+                        labels = c("EM 1","EM 2","EM 3", "EM 4"))
+
+# Plot
+ggplot(plot_df, aes(Year, value, color = Model)) +
+  geom_line() +
+  geom_point() +
+  facet_wrap(~Variable, scales = "free_y") +
+  scale_color_manual(values = c("red","blue","green", "purple")) +
+  labs(
+    x = "Year",
+    y = NULL
+  ) +
+  theme_bw() +
+  theme(
+    strip.text = element_text(face = "bold"),
+    legend.position = "top"
+  )
+```

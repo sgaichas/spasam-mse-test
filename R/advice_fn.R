@@ -508,18 +508,61 @@ advice_fn <- function(em,
       
       # How to get the OFL
       ofl_proj <- project_wham(em, proj.opts = list(use.FXSPR = TRUE, n.yrs=1), MakeADFun.silent = TRUE)
-      OFL <- tail(apply(ofl_proj$rep$pred_catch,1,sum),1)  #[i+1]
-      
+      OFL <- tail(apply(ofl_proj$rep$pred_catch,1,sum),1)
       ABC <- OFL * qlnorm(pstar, log(1), log(OFL_CV + 1))  
       
       cat(sprintf("SSB_t / SSB_XSPR = %.3f -> pstar = %.2f; OFL = %.3f\n", ratio, pstar, OFL))
       
+      # Empty variables to collect catch and pstar values
+      catch.proj <- rep(0,pro.yr)
+      
+      # first year catch is the ABC calculated above
+      catch.proj[1] <- ABC
+      
+      # now project each year to fill the catch vector
+      for(i in 1:(pro.yr-1)){
+       
+        proj_F_opt <- c(rep(5,i),rep(3,pro.yr-i))
+        
+        ofl_proj <- project_wham(em, proj.opts = list(n.yrs = pro.yr,proj_F_opt = proj_F_opt, proj_Fcatch = catch.proj), MakeADFun.silent = TRUE)
+        
+        OFL <- tail(apply(ofl_proj$rep$pred_catch,1,sum),1) #[i+1]
+
+        # update pstar
+        SSB_t <- sum(ofl_proj$rep$SSB[nrow(ofl_proj$rep$SSB), ]) #[i]
+        ratio <- SSB_t / SSB_x
+        
+        if (ratio >= BThresh_high) {
+          pstar <- max_pstar
+        } else if (ratio > BThresh_up) {
+          slope <- (max_pstar - mid_pstar) / (BThresh_high - BThresh_up)
+          pstar <- slope * (ratio - BThresh_up) + mid_pstar
+        } else if (ratio > BThresh_low) { 
+          slope <- (mid_pstar - min_pstar) / (BThresh_up - BThresh_low)
+          pstar <- slope * (ratio - BThresh_low) + min_pstar
+        } else {
+          pstar <- min_pstar
+        }
+        
+        ABC <- OFL * qlnorm(pstar, log(1), log(OFL_CV + 1))  
+        
+        cat(sprintf("SSB_t / SSB_XSPR = %.3f -> pstar = %.2f; OFL = %.3f\n", ratio, pstar, OFL))
+        
+        # As long as its not the terminal year, add the abc catch to catch vector and repeat
+        if(i<pro.yr)
+        {
+          catch.proj[i+1] <- ABC
+          #if(!is.null(avg.abc)) catch.proj[i+1] <- avg.abc
+        }
+      }
+      
+      # fill proj_opts with catch vector
       proj_opts$use.last.F   <- FALSE
       proj_opts$use.avg.F    <- FALSE
       proj_opts$use.FXSPR    <- FALSE
       proj_opts$use.FMSY     <- FALSE
       proj_opts$proj.F       <- NULL
-      proj_opts$proj.catch   <- as.numeric(ABC)
+      proj_opts$proj.catch   <- as.numeric(catch.proj)
       proj_opts$percentFXSPR <- NULL
       proj_opts$percentFMSY  <- NULL
      }
@@ -554,21 +597,64 @@ advice_fn <- function(em,
       }
 
       # How to get the OFL
-      ofl_proj <- project_wham(em, proj.opts = list(use_FMSY = TRUE, n.yrs=1), MakeADFun.silent = TRUE)
-      OFL <- tail(apply(ofl_proj$rep$pred_catch,1,sum),1)  #[i+1]
-      
+      ofl_proj <- project_wham(em, proj.opts = list(use.FXSPR = TRUE, n.yrs=1), MakeADFun.silent = TRUE)
+      OFL <- tail(apply(ofl_proj$rep$pred_catch,1,sum),1)
       ABC <- OFL * qlnorm(pstar, log(1), log(OFL_CV + 1))  
       
       cat(sprintf("SSB_t / SSB_XSPR = %.3f -> pstar = %.2f; OFL = %.3f\n", ratio, pstar, OFL))
       
+      # Empty variables to collect catch and pstar values
+      catch.proj <- rep(0,pro.yr)
+      
+      # first year catch is the ABC calculated above
+      catch.proj[1] <- ABC
+      
+      # now project each year to fill the catch vector
+      for(i in 1:(pro.yr-1)){
+        
+        proj_F_opt <- c(rep(5,i),rep(3,pro.yr-i))
+        
+        ofl_proj <- project_wham(em, proj.opts = list(n.yrs = pro.yr,proj_F_opt = proj_F_opt, proj_Fcatch = catch.proj), MakeADFun.silent = TRUE)
+        
+        OFL <- tail(apply(ofl_proj$rep$pred_catch,1,sum),1) #[i+1]
+        
+        # update pstar
+        SSB_t <- sum(ofl_proj$rep$SSB[nrow(ofl_proj$rep$SSB), ]) #[i]
+        ratio <- SSB_t / SSB_x
+        
+        if (ratio >= BThresh_high) {
+          pstar <- max_pstar
+        } else if (ratio > BThresh_up) {
+          slope <- (max_pstar - mid_pstar) / (BThresh_high - BThresh_up)
+          pstar <- slope * (ratio - BThresh_up) + mid_pstar
+        } else if (ratio > BThresh_low) { 
+          slope <- (mid_pstar - min_pstar) / (BThresh_up - BThresh_low)
+          pstar <- slope * (ratio - BThresh_low) + min_pstar
+        } else {
+          pstar <- min_pstar
+        }
+        
+        ABC <- OFL * qlnorm(pstar, log(1), log(OFL_CV + 1))  
+        
+        cat(sprintf("SSB_t / SSB_XSPR = %.3f -> pstar = %.2f; OFL = %.3f\n", ratio, pstar, OFL))
+        
+        # As long as its not the terminal year, add the abc catch to catch vector and repeat
+        if(i<pro.yr)
+        {
+          catch.proj[i+1] <- ABC
+          #if(!is.null(avg.abc)) catch.proj[i+1] <- avg.abc
+        }
+      }
+      
+      # fill proj_opts with catch vector
       proj_opts$use.last.F   <- FALSE
       proj_opts$use.avg.F    <- FALSE
       proj_opts$use.FXSPR    <- FALSE
       proj_opts$use.FMSY     <- FALSE
       proj_opts$proj.F       <- NULL
-      proj_opts$proj.catch   <- as.numeric(ABC)
-      proj_opts$percentFMSY  <- NULL
+      proj_opts$proj.catch   <- as.numeric(catch.proj)
       proj_opts$percentFXSPR <- NULL
+      proj_opts$percentFMSY  <- NULL
     }
     
     validate_single_fspec(proj_opts, hcr.type = hcr.type)
