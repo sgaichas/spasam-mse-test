@@ -508,12 +508,11 @@ advice_fn <- function(em,
       
       # How to get the OFL
       ofl_proj <- project_wham(em, proj.opts = list(use.FXSPR = TRUE, n.yrs=1), MakeADFun.silent = TRUE)
-      #OFL <- SSB_x * exp(em$rep$log_FXSPR[length(em$rep$log_FXSPR)])
       OFL <- tail(apply(ofl_proj$rep$pred_catch,1,sum),1)  #[i+1]
       
       ABC <- OFL * qlnorm(pstar, log(1), log(OFL_CV + 1))  
       
-      cat(sprintf("SSB_t / SSB_XSPR = %.3f -> pstar = %.2f\n", ratio, pstar))
+      cat(sprintf("SSB_t / SSB_XSPR = %.3f -> pstar = %.2f; OFL = %.3f\n", ratio, pstar, OFL))
       
       proj_opts$use.last.F   <- FALSE
       proj_opts$use.avg.F    <- FALSE
@@ -555,13 +554,13 @@ advice_fn <- function(em,
       }
 
       # How to get the OFL
-      OFL <- sum(em$rep$pred_catch[nrow(em$rep$pred_catch), ])
-      #OFL <- tail(apply(mod.proj$rep$pred_catch,1,sum),projyr)[i+1]
-
-      ABC <- OFL * qlnorm(pstar, log(1), log(OFL_CV + 1))
-
-      cat(sprintf("SSB_t / SSB_XSPR = %.3f -> pstar = %.2f\n", ratio, pstar))
-
+      ofl_proj <- project_wham(em, proj.opts = list(use_FMSY = TRUE, n.yrs=1), MakeADFun.silent = TRUE)
+      OFL <- tail(apply(ofl_proj$rep$pred_catch,1,sum),1)  #[i+1]
+      
+      ABC <- OFL * qlnorm(pstar, log(1), log(OFL_CV + 1))  
+      
+      cat(sprintf("SSB_t / SSB_XSPR = %.3f -> pstar = %.2f; OFL = %.3f\n", ratio, pstar, OFL))
+      
       proj_opts$use.last.F   <- FALSE
       proj_opts$use.avg.F    <- FALSE
       proj_opts$use.FXSPR    <- FALSE
