@@ -11,7 +11,7 @@
 
 <meta name="author" content="Sarah Gaichas" />
 
-<meta name="date" content="2026-06-26" />
+<meta name="date" content="2026-06-29" />
 
 <title>Test Harvest Control Rule</title>
 
@@ -352,7 +352,7 @@ display: none;
 
 <h1 class="title toc-ignore">Test Harvest Control Rule</h1>
 <h4 class="author">Sarah Gaichas</h4>
-<h4 class="date">2026-06-26</h4>
+<h4 class="date">2026-06-29</h4>
 
 </div>
 
@@ -783,7 +783,7 @@ mods[[1]] = loop_through_fn(om = om_with_data,
 ## 
 ## Now projecting data for years after 23
 ## Please ignore Warning in check_projF(proj_mod).
-## Total Runtime =  20.30166</code></pre>
+## Total Runtime =  20.45263</code></pre>
 </div>
 <div id="em2-is-all-one-area-for-stock-and-fleets-100-fxspr" class="section level3">
 <h3>EM2 is all one area for stock and fleets, 100% FXSPR</h3>
@@ -978,7 +978,7 @@ mods[[2]] = loop_through_fn(om = om_with_data,
 ## 
 ## Now projecting data for years after 23
 ## Please ignore Warning in check_projF(proj_mod).
-## Total Runtime =  20.24223</code></pre>
+## Total Runtime =  20.1568</code></pre>
 </div>
 <div id="em3-is-all-one-area-for-stock-and-fleets-hockey-stick-hcr" class="section level3">
 <h3>EM3 is all one area for stock and fleets, hockey stick HCR</h3>
@@ -1173,7 +1173,7 @@ mods[[3]] = loop_through_fn(om = om_with_data,
 ## 
 ## Now projecting data for years after 23
 ## Please ignore Warning in check_projF(proj_mod).
-## Total Runtime =  20.11048</code></pre>
+## Total Runtime =  20.22953</code></pre>
 </div>
 </div>
 <div id="compare-performance" class="section level2">
@@ -1548,7 +1548,7 @@ mods[[4]] = loop_through_fn(om = om_with_data,
 ## 
 ## Now projecting data for years after 23
 ## Please ignore Warning in check_projF(proj_mod).
-## Total Runtime =  24.64651</code></pre>
+## Total Runtime =  24.82312</code></pre>
 </div>
 <div id="em5-is-all-one-area-for-stock-and-fleets-mafmc-risk-policy-and-hcr-with-200-ofl-cv" class="section level3">
 <h3>EM5 is all one area for stock and fleets, MAFMC risk policy and HCR
@@ -1755,7 +1755,7 @@ mods[[5]] = loop_through_fn(om = om_with_data,
 ## 
 ## Now projecting data for years after 23
 ## Please ignore Warning in check_projF(proj_mod).
-## Total Runtime =  24.49263</code></pre>
+## Total Runtime =  24.41467</code></pre>
 </div>
 </div>
 <div id="compare-performance-with-mafmc-hcr" class="section level2">
@@ -2347,6 +2347,358 @@ Now generating catch advice...
 Year_24 1314.308 1314.308
 Year_25 2259.491 2259.491
 Year_26 2405.756 2405.756
+
+Now calculating F at age in the OM given the catch advice...
+
+Now calculating fleet-specific F in year 24
+Warning in max(exp(rep$log_FAA_tot[year, ])) :
+  no non-missing arguments to max; returning -Inf
+Warning in max(rep$FAA[i, year, ]) :
+  no non-missing arguments to max; returning -Inf
+Warning in max(rep$FAA[i, year, ]) :
+  no non-missing arguments to max; returning -Inf
+Error in sel[f, a] : subscript out of bounds</code></pre>
+</div>
+<div id="does-a-different-hcr-also-crash-try-100-fxspr-3-assessment-loops" class="section level3">
+<h3>Does a different HCR also crash? Try 100% FXSPR 3 assessment
+loops</h3>
+<p>Yes it also crashes at the same point, calculating fleet specific F
+in year 24</p>
+<pre class="r"><code>hcr &lt;- list()
+hcr$hcr.type &lt;- 1
+hcr$hcr.opts &lt;- list(use_FXSPR = TRUE, percentFXSPR = 100)
+
+
+mods[[7]] = loop_through_fn(om = om_with_data,
+                            em_info = info,
+                            random = random,
+                            sel_em = sel_em,
+                            NAA_re_em = NAA_re_em,
+                            move_em = NULL,
+                            age_comp_em = &quot;logistic-normal-miss0&quot;,
+                            em.opt = list(separate.em = TRUE, separate.em.type = 1, do.move = FALSE, est.move = FALSE),
+                            aggregate_catch_info = list(n_fleets = 1, fleet_pointer = c(1,1), use_catch_weighted_waa = TRUE, catch_Neff = 100, catch_cv = 0.1),
+                            aggregate_index_info = list(n_indices = 1, index_pointer = c(1,1), use_catch_weighted_waa = TRUE, index_Neff = 100, index_cv = 0.1),
+                            hcr = hcr,
+                            assess_years = assess.years,
+                            assess_interval = assess.interval,
+                            base_years = base.years,
+                            year.use = 20,
+                            seed = 123)</code></pre>
+<p>Output pasted below</p>
+<pre><code>Now conducting stock assessment for year 20
+Using user-specified WAA array. WAA can be time-varying.
+
+  --------------------
+  
+  IMPORTANT!!!!
+  
+  For the current version of WHAM, if WAA pointers are specified (i.e., WAA differs across fleets, indices, or stocks),
+  
+  they need to be updated *after* prepare_wham_input(). Otherwise, a global WAA will be applied to all components.
+          
+  --------------------
+          
+
+  --------------------
+  IMPORTANT!!!!
+  
+  For the current version of WHAM:
+  
+  - If CV and effective sample size for **catch** vary over years,
+  or if some years have missing aggregate or age composition data for **catch**,
+  you must update these inputs *after* prepare_wham_input()
+  using the update_input_catch_info() function.
+  
+  - If CV and effective sample size for **indices** vary over years,
+  or if some years have missing aggregate or age composition data for **indices**,
+  you must update these inputs *after* prepare_wham_input()
+  using the update_input_index_info() function.
+  
+  Otherwise, WHAM will assume constant CV/sample size and complete data across all years.
+  --------------------
+          
+
+--Creating input---------------------------------------------------------------------------------------------------------------------
+
+basic_info done
+catch done
+indices done
+WAA done
+NAA done
+q done
+selectivity done
+age_comp done
+F done
+M done
+move done
+osa_obs done
+
+--Input Complete--------------------------------------------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------------------------------------------------------------
+WHAM version 2.0.0 and forward: 
+1) makes major changes to the structure of some data, parameters, and reported objects.
+2) decouples random effects for recruitment and random effects for older ages by default. To obtain results from previous versions set NAA_re$decouple_recruitment = FALSE.
+3) does not bias correct any log-normal process or observation errors. To configure these, set basic_info$bias_correct_process = TRUE and/or basic_info$bias_correct_observation = TRUE.
+-------------------------------------------------------------------------------------------------------------------------------------
+input$data$spawn_regions will be defined from input$data$NAA_where for age 1.
+--Catch------------------------------------------------------------------------------------------------------------------------------ 
+catch_info$waa_pointer_fleets was not provided, so the first waa matrix will be used for all fleets. 
+Selectivity blocks for each fleet:
+Fleet 1: 1
+
+-------------------------------------------------------------------------------------------------------------------------------------
+
+--Indices----------------------------------------------------------------------------------------------------------------------------
+Selectivity blocks for each index:
+index_1: 2
+
+-------------------------------------------------------------------------------------------------------------------------------------
+
+--NAA--------------------------------------------------------------------------------------------------------------------------------
+
+ Same NAA_re$sigma being used for all stocks (rec+1).
+-------------------------------------------------------------------------------------------------------------------------------------
+
+--Selectivity------------------------------------------------------------------------------------------------------------------------
+selectivity$n_selblocks was not provided so number of selblocks: 2, is being determined by max(input$data$selblock_pointer_fleets,input$data$selblock_pointer_indices).
+(Mean) selectivity block models are:
+Block 1: logistic
+Block 2: logistic
+
+Random effects options for each selectivity block are:
+Block 1: none
+Block 2: none
+
+-------------------------------------------------------------------------------------------------------------------------------------
+
+--Reference points-------------------------------------------------------------------------------------------------------------------
+For annual SPR-based reference points, corresponding annual conditionally expected recruitments are used. 
+-------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+    
+    --------------------
+    
+    IMPORTANT!!!
+    
+    WAA pointers are updated!
+    
+    --------------------
+            
+Now fitting assessment model...
+Using stats::nlminb for optimization with these control parameters:
+iter.max: 1000
+eval.max: 1000
+Now checking convergence of assessment model...
+
+Assessment model is converged.
+
+Now using the EM to project catch...
+
+Harvest Control Rule type 1
+Final Projection Options:
+ n.yrs: 3
+ use.last.F: FALSE
+ use.avg.F: FALSE
+ use.FXSPR: TRUE
+ percentFXSPR: 100
+ use.FMSY: FALSE
+ percentFMSY: 75
+ avg.yrs: 16, 17, 18, 19, 20
+ cont.ecov: TRUE
+ use.last.ecov: FALSE
+ cont.M.re: FALSE
+ cont.L.re: FALSE
+
+Projected catch from assessment model is
+         [,1]
+[1,] 27265.87
+[2,] 25167.63
+[3,] 23200.54
+
+Now allocating catch...
+
+Now generating catch advice...
+         Fleet_1  Fleet_2
+Year_21 13632.94 13632.94
+Year_22 12583.82 12583.82
+Year_23 11600.27 11600.27
+
+Now calculating F at age in the OM given the catch advice...
+
+Now calculating fleet-specific F in year 21
+
+Fishing mortality is 3.11252412714693, 0.504212688683502
+
+Now updating F in OM for year 21
+
+Now simulating data for year 21
+
+Now projecting data for years after 21
+
+Now calculating fleet-specific F in year 22
+
+Fishing mortality is 10, 0.727106313484159
+
+Now updating F in OM for year 22
+
+Now simulating data for year 22
+
+Now projecting data for years after 22
+
+Now calculating fleet-specific F in year 23
+
+Fishing mortality is 10, 1.14368680246074
+
+Now updating F in OM for year 23
+
+Now simulating data for year 23
+
+Now projecting data for years after 23
+
+Now conducting stock assessment for year 23
+Using user-specified WAA array. WAA can be time-varying.
+
+  --------------------
+  
+  IMPORTANT!!!!
+  
+  For the current version of WHAM, if WAA pointers are specified (i.e., WAA differs across fleets, indices, or stocks),
+  
+  they need to be updated *after* prepare_wham_input(). Otherwise, a global WAA will be applied to all components.
+          
+  --------------------
+          
+
+  --------------------
+  IMPORTANT!!!!
+  
+  For the current version of WHAM:
+  
+  - If CV and effective sample size for **catch** vary over years,
+  or if some years have missing aggregate or age composition data for **catch**,
+  you must update these inputs *after* prepare_wham_input()
+  using the update_input_catch_info() function.
+  
+  - If CV and effective sample size for **indices** vary over years,
+  or if some years have missing aggregate or age composition data for **indices**,
+  you must update these inputs *after* prepare_wham_input()
+  using the update_input_index_info() function.
+  
+  Otherwise, WHAM will assume constant CV/sample size and complete data across all years.
+  --------------------
+          
+
+--Creating input---------------------------------------------------------------------------------------------------------------------
+
+basic_info done
+catch done
+indices done
+WAA done
+NAA done
+q done
+selectivity done
+age_comp done
+F done
+M done
+move done
+osa_obs done
+
+--Input Complete--------------------------------------------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------------------------------------------------------------
+WHAM version 2.0.0 and forward: 
+1) makes major changes to the structure of some data, parameters, and reported objects.
+2) decouples random effects for recruitment and random effects for older ages by default. To obtain results from previous versions set NAA_re$decouple_recruitment = FALSE.
+3) does not bias correct any log-normal process or observation errors. To configure these, set basic_info$bias_correct_process = TRUE and/or basic_info$bias_correct_observation = TRUE.
+-------------------------------------------------------------------------------------------------------------------------------------
+input$data$spawn_regions will be defined from input$data$NAA_where for age 1.
+--Catch------------------------------------------------------------------------------------------------------------------------------ 
+catch_info$waa_pointer_fleets was not provided, so the first waa matrix will be used for all fleets. 
+Selectivity blocks for each fleet:
+Fleet 1: 1
+
+-------------------------------------------------------------------------------------------------------------------------------------
+
+--Indices----------------------------------------------------------------------------------------------------------------------------
+Selectivity blocks for each index:
+index_1: 2
+
+-------------------------------------------------------------------------------------------------------------------------------------
+
+--NAA--------------------------------------------------------------------------------------------------------------------------------
+
+ Same NAA_re$sigma being used for all stocks (rec+1).
+-------------------------------------------------------------------------------------------------------------------------------------
+
+--Selectivity------------------------------------------------------------------------------------------------------------------------
+selectivity$n_selblocks was not provided so number of selblocks: 2, is being determined by max(input$data$selblock_pointer_fleets,input$data$selblock_pointer_indices).
+(Mean) selectivity block models are:
+Block 1: logistic
+Block 2: logistic
+
+Random effects options for each selectivity block are:
+Block 1: none
+Block 2: none
+
+-------------------------------------------------------------------------------------------------------------------------------------
+
+--Reference points-------------------------------------------------------------------------------------------------------------------
+For annual SPR-based reference points, corresponding annual conditionally expected recruitments are used. 
+-------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+    
+    --------------------
+    
+    IMPORTANT!!!
+    
+    WAA pointers are updated!
+    
+    --------------------
+            
+Now fitting assessment model...
+Using stats::nlminb for optimization with these control parameters:
+iter.max: 1000
+eval.max: 1000
+Now checking convergence of assessment model...
+
+Assessment model is converged.
+
+Now using the EM to project catch...
+
+Harvest Control Rule type 1
+Final Projection Options:
+ n.yrs: 3
+ use.last.F: FALSE
+ use.avg.F: FALSE
+ use.FXSPR: TRUE
+ percentFXSPR: 100
+ use.FMSY: FALSE
+ percentFMSY: 75
+ avg.yrs: 19, 20, 21, 22, 23
+ cont.ecov: TRUE
+ use.last.ecov: FALSE
+ cont.M.re: FALSE
+ cont.L.re: FALSE
+
+Projected catch from assessment model is
+         [,1]
+[1,] 4406.320
+[2,] 5263.167
+[3,] 6295.902
+
+Now allocating catch...
+
+Now generating catch advice...
+         Fleet_1  Fleet_2
+Year_24 2203.160 2203.160
+Year_25 2631.584 2631.584
+Year_26 3147.951 3147.951
 
 Now calculating F at age in the OM given the catch advice...
 
