@@ -520,6 +520,7 @@ ggplot(plot_df, aes(Year, value, color = Model)) +
     legend.position = "top"
   )
 ```
+
 ## Make sure it runs for more than one assessment cycle
 
 ### EM6 is all one area for stock and fleets, MAFMC risk policy and HCR for 3 cycles

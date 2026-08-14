@@ -11,7 +11,7 @@
 
 <meta name="author" content="Sarah Gaichas" />
 
-<meta name="date" content="2026-06-22" />
+<meta name="date" content="2026-08-14" />
 
 <title>Test Installation</title>
 
@@ -352,7 +352,7 @@ display: none;
 
 <h1 class="title toc-ignore">Test Installation</h1>
 <h4 class="author">Sarah Gaichas</h4>
-<h4 class="date">2026-06-22</h4>
+<h4 class="date">2026-08-14</h4>
 
 </div>
 
@@ -754,7 +754,6 @@ mods[[1]] = loop_through_fn(om = om_with_data,
 ## Now calculating fleet-specific F in year 21</code></pre>
 <pre><code>## Loading required package: numDeriv</code></pre>
 <pre><code>## Loading required package: expm</code></pre>
-<pre><code>## Warning: package &#39;expm&#39; was built under R version 4.3.3</code></pre>
 <pre><code>## Loading required package: Matrix</code></pre>
 <pre><code>## 
 ## Attaching package: &#39;expm&#39;</code></pre>
@@ -762,7 +761,7 @@ mods[[1]] = loop_through_fn(om = om_with_data,
 ## 
 ##     expm</code></pre>
 <pre><code>## 
-## Fishing mortality is 0.26984404786148, 0.183346611922117
+## Fishing mortality is 0.269844047861546, 0.183346611922194
 ## 
 ## Now updating F in OM for year 21
 ## 
@@ -772,7 +771,7 @@ mods[[1]] = loop_through_fn(om = om_with_data,
 ## 
 ## Now calculating fleet-specific F in year 22
 ## 
-## Fishing mortality is 0.238321889026358, 0.206036120097293
+## Fishing mortality is 0.238321889026578, 0.206036120097367
 ## 
 ## Now updating F in OM for year 22
 ## 
@@ -782,7 +781,7 @@ mods[[1]] = loop_through_fn(om = om_with_data,
 ## 
 ## Now calculating fleet-specific F in year 23
 ## 
-## Fishing mortality is 0.252241503332636, 0.179438506326218
+## Fishing mortality is 0.252241503332788, 0.179438506326279
 ## 
 ## Now updating F in OM for year 23
 ## 
@@ -790,7 +789,7 @@ mods[[1]] = loop_through_fn(om = om_with_data,
 ## 
 ## Now projecting data for years after 23
 ## Please ignore Warning in check_projF(proj_mod).
-## Total Runtime =  2.615823</code></pre>
+## Total Runtime =  2.592553</code></pre>
 </div>
 <div id="em2-is-all-one-area-for-stock-with-fleets-accounting-for-spatial-structure" class="section level2">
 <h2>EM2 is all one area for stock with fleets accounting for spatial
@@ -961,7 +960,7 @@ mods[[2]] = loop_through_fn(om = om_with_data,
 ## 
 ## Now calculating fleet-specific F in year 21
 ## 
-## Fishing mortality is 0.156859247113757, 0.162455005216372
+## Fishing mortality is 0.156859247113751, 0.162455005216357
 ## 
 ## Now updating F in OM for year 21
 ## 
@@ -971,7 +970,7 @@ mods[[2]] = loop_through_fn(om = om_with_data,
 ## 
 ## Now calculating fleet-specific F in year 22
 ## 
-## Fishing mortality is 0.132378444450622, 0.179329083568263
+## Fishing mortality is 0.132378444450589, 0.179329083568249
 ## 
 ## Now updating F in OM for year 22
 ## 
@@ -981,7 +980,7 @@ mods[[2]] = loop_through_fn(om = om_with_data,
 ## 
 ## Now calculating fleet-specific F in year 23
 ## 
-## Fishing mortality is 0.132576375330346, 0.154385905748539
+## Fishing mortality is 0.132576375330335, 0.154385905748544
 ## 
 ## Now updating F in OM for year 23
 ## 
@@ -989,7 +988,7 @@ mods[[2]] = loop_through_fn(om = om_with_data,
 ## 
 ## Now projecting data for years after 23
 ## Please ignore Warning in check_projF(proj_mod).
-## Total Runtime =  2.742911</code></pre>
+## Total Runtime =  2.664117</code></pre>
 </div>
 <div id="em3-is-separate-assessments-in-each-stock-area" class="section level2">
 <h2>EM3 is separate assessments in each stock area</h2>
@@ -1273,7 +1272,7 @@ mods[[3]] = loop_through_fn(om = om_with_data,
 ## 
 ## Now calculating fleet-specific F in year 21
 ## 
-## Fishing mortality is 0.118684546131375, 0.135391292446545
+## Fishing mortality is 0.118684546131381, 0.135391292446537
 ## 
 ## Now updating F in OM for year 21
 ## 
@@ -1283,7 +1282,7 @@ mods[[3]] = loop_through_fn(om = om_with_data,
 ## 
 ## Now calculating fleet-specific F in year 22
 ## 
-## Fishing mortality is 0.099848342647638, 0.149320156865297
+## Fishing mortality is 0.0998483426476316, 0.149320156865297
 ## 
 ## Now updating F in OM for year 22
 ## 
@@ -1293,7 +1292,7 @@ mods[[3]] = loop_through_fn(om = om_with_data,
 ## 
 ## Now calculating fleet-specific F in year 23
 ## 
-## Fishing mortality is 0.0996825979022665, 0.128822345949448
+## Fishing mortality is 0.0996825979024187, 0.12882234594942
 ## 
 ## Now updating F in OM for year 23
 ## 
@@ -1301,11 +1300,10 @@ mods[[3]] = loop_through_fn(om = om_with_data,
 ## 
 ## Now projecting data for years after 23
 ## Please ignore Warning in check_projF(proj_mod).
-## Total Runtime =  2.743225</code></pre>
+## Total Runtime =  2.70924</code></pre>
 </div>
-<div id="em4-is-disaggregated-areas-for-the-stock-and-fleeets-no-movement" class="section level2">
-<h2>EM4 is disaggregated areas for the stock and fleeets no
-movement</h2>
+<div id="em4-is-disaggregated-areas-for-the-stock-and-fleets-no-movement" class="section level2">
+<h2>EM4 is disaggregated areas for the stock and fleets no movement</h2>
 <pre class="r"><code>n_stocks = n_regions = n_fleets = n_indices = 2
 
 sel_em &lt;- list(model=rep(&quot;logistic&quot;,n_fleets+n_indices),
@@ -1475,7 +1473,7 @@ mods[[4]] = loop_through_fn(om = om_with_data,
 ## 
 ## Now calculating fleet-specific F in year 21
 ## 
-## Fishing mortality is 0.157286848819552, 0.163425603391854
+## Fishing mortality is 0.157286848819547, 0.163425603391849
 ## 
 ## Now updating F in OM for year 21
 ## 
@@ -1485,7 +1483,7 @@ mods[[4]] = loop_through_fn(om = om_with_data,
 ## 
 ## Now calculating fleet-specific F in year 22
 ## 
-## Fishing mortality is 0.131777929269326, 0.181344666809931
+## Fishing mortality is 0.131777929269196, 0.18134466680975
 ## 
 ## Now updating F in OM for year 22
 ## 
@@ -1495,7 +1493,7 @@ mods[[4]] = loop_through_fn(om = om_with_data,
 ## 
 ## Now calculating fleet-specific F in year 23
 ## 
-## Fishing mortality is 0.131232412615656, 0.156749752959521
+## Fishing mortality is 0.131232412615586, 0.156749752959491
 ## 
 ## Now updating F in OM for year 23
 ## 
@@ -1503,10 +1501,10 @@ mods[[4]] = loop_through_fn(om = om_with_data,
 ## 
 ## Now projecting data for years after 23
 ## Please ignore Warning in check_projF(proj_mod).
-## Total Runtime =  2.932802</code></pre>
+## Total Runtime =  2.839036</code></pre>
 </div>
-<div id="em5-is-disaggregated-areas-for-the-stock-and-fleeets-with-movement" class="section level2">
-<h2>EM5 is disaggregated areas for the stock and fleeets with
+<div id="em5-is-disaggregated-areas-for-the-stock-and-fleets-with-movement" class="section level2">
+<h2>EM5 is disaggregated areas for the stock and fleets with
 movement</h2>
 <pre class="r"><code>n_stocks = n_regions = n_fleets = n_indices = 2
 
@@ -1706,7 +1704,7 @@ move_em &lt;- generate_move(
 ## 
 ## Now calculating fleet-specific F in year 21
 ## 
-## Fishing mortality is 0.149809556769965, 0.147682779260651
+## Fishing mortality is 0.149809556770922, 0.147682779260251
 ## 
 ## Now updating F in OM for year 21
 ## 
@@ -1716,7 +1714,7 @@ move_em &lt;- generate_move(
 ## 
 ## Now calculating fleet-specific F in year 22
 ## 
-## Fishing mortality is 0.12489217082595, 0.161562483513625
+## Fishing mortality is 0.12489217082627, 0.161562483513682
 ## 
 ## Now updating F in OM for year 22
 ## 
@@ -1726,7 +1724,7 @@ move_em &lt;- generate_move(
 ## 
 ## Now calculating fleet-specific F in year 23
 ## 
-## Fishing mortality is 0.123724839491053, 0.137928992610475
+## Fishing mortality is 0.123724839491395, 0.137928992610512
 ## 
 ## Now updating F in OM for year 23
 ## 
@@ -1734,7 +1732,7 @@ move_em &lt;- generate_move(
 ## 
 ## Now projecting data for years after 23
 ## Please ignore Warning in check_projF(proj_mod).
-## Total Runtime =  3.711459</code></pre>
+## Total Runtime =  24.05047</code></pre>
 </div>
 <div id="comparisons-among-ems" class="section level2">
 <h2>Comparisons among EMs</h2>
