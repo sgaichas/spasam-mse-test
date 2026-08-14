@@ -58,8 +58,8 @@ Global settings
 
 ```{r}
 
-input_hist <- NAAmod2022$input #prepare_wham_input(gb_dat)
-input      <- NAAmod2022$input #prepare_wham_input(gb_dat)
+input_hist <- recdev2022$input #prepare_wham_input(gb_dat)
+input      <- recdev2022$input #prepare_wham_input(gb_dat)
 
 n_stocks  <- 1L
 n_regions <- 1L
@@ -307,29 +307,36 @@ input_histfit <- update_input_index_info(
   remove_paa_years = remove_paa_years1
 )
 
-om_file <- system.file("extdata", "OM.RDS", package = "SPASAM.MSE")
+# om_file <- system.file("extdata", "OM.RDS", package = "SPASAM.MSE")
+# 
+# if (file.exists(om_file)) {
+#   
+#   OM <- readRDS(om_file)
+#   
+# } else {
+#   
+#.  # This blows up every time
+#   OM <- fit_wham(
+#     input_histfit,
+#     do.fit = TRUE,
+#     do.brps = TRUE,
+#     do.retro = FALSE,
+#     do.osa = FALSE,
+#     MakeADFun.silent = TRUE
+#   )
+#   
+#   saveRDS(OM, file.path(tempdir(), "OM.RDS"))
+#   
+# }
 
-if (file.exists(om_file)) {
-  
-  OM <- readRDS(om_file)
-  
-} else {
-  
-  OM <- fit_wham(
-    input_histfit,
-    do.fit = TRUE,
-    do.brps = TRUE,
-    do.retro = FALSE,
-    do.osa = FALSE,
-    MakeADFun.silent = TRUE
-  )
-  
-  saveRDS(OM, file.path(tempdir(), "OM.RDS"))
-  
-}
+# could the initial OM not be the fitted model?
+
+OM <- recdev2022
 
 check_convergence(OM)
 ```
+
+
 
 ## Simpler not from assessment
 
