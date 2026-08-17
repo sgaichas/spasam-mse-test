@@ -316,14 +316,14 @@ input_histfit <- update_input_index_info(
 # } else {
 #   
 #.  # This blows up every time
-#   OM <- fit_wham(
-#     input_histfit,
-#     do.fit = TRUE,
-#     do.brps = TRUE,
-#     do.retro = FALSE,
-#     do.osa = FALSE,
-#     MakeADFun.silent = TRUE
-#   )
+  # OM <- fit_wham(
+  #   input_histfit,
+  #   do.fit = TRUE,
+  #   do.brps = TRUE,
+  #   do.retro = FALSE,
+  #   do.osa = FALSE,
+  #   MakeADFun.silent = TRUE
+  # )
 #   
 #   saveRDS(OM, file.path(tempdir(), "OM.RDS"))
 #   
@@ -336,6 +336,144 @@ OM <- recdev2022
 check_convergence(OM)
 ```
 
+Now try using the original model as is and extending to projections. changed some dims here (waa from 5 in the example to 2)
+
+```{r}
+user_maturity <- array(NA_real_, dim = c(n_stocks, n_proj_years, n_ages))
+user_maturity[, 1:n_hist_years, ] <- OM$input$data$mature #[, 1:n_hist_years, ]
+for (iy in (n_hist_years + 1L):n_proj_years) {
+  user_maturity[, iy, ] <- OM$input$data$mature[n_hist_years, , drop = FALSE] #[, n_hist_years, , drop = FALSE]
+}
+
+user_waa <- list()
+user_waa$waa <- array(NA_real_, dim = c(2, n_proj_years, n_ages))
+user_waa$waa[, 1:n_hist_years, ] <- OM$input$data$waa[, 1:n_hist_years, ]
+for (iy in (n_hist_years + 1L):n_proj_years) {
+  user_waa$waa[, iy, ] <- OM$input$data$waa[, n_hist_years, , drop = FALSE]
+}
+
+user_waa$waa_pointer_fleets   <- OM$input$data$waa_pointer_fleets
+user_waa$waa_pointer_indices  <- OM$input$data$waa_pointer_indices
+user_waa$waa_pointer_totcatch <- OM$input$data$waa_pointer_totcatch
+user_waa$waa_pointer_ssb      <- OM$input$data$waa_pointer_ssb
+user_waa$waa_pointer_M        <- OM$input$data$waa_pointer_M
+```
+
+Catch and index, may have the same issue as above, see if year specific will work later
+
+```{r}
+# catch_info <- list(
+#   catch_cv      = 0.05,
+#   catch_Neff    = 50,
+#   use_agg_catch = 1,
+#   use_catch_paa = 1
+# )
+# 
+# index_info <- list(
+#   index_cv        = rep(0.5, n_indices),
+#   index_Neff      = rep(25, n_indices),
+#   fracyr_indices  = c(0.25, 0.75, 0.25),
+#   q               = c(2.110e-4, 2.247e-4, 2.683e-4),
+#   use_indices     = rep(1, n_indices),
+#   use_index_paa   = rep(1, n_indices),
+#   units_indices   = rep(2, n_indices),
+#   units_index_paa = rep(2, n_indices)
+# )
+
+catch_info <- list(
+  catch_cv      = 0.3,
+  catch_Neff    = 41,
+  use_agg_catch = 1,
+  use_catch_paa = 1
+)
+
+index_info <- list(
+  index_cv        = c(0.4699923, 0.5389348, 0.6166915, 0.5313571, 0.7573711, 0.3517145), #rep(0.5, n_indices),
+  index_Neff      = c(10.967742,  4.838710,  1.677419,  4.967742,  1.064516, 0.000000), #rep(25, n_indices),
+  fracyr_indices  = c(0.75, 0.75, 0.75, 0.25, 0.3333333, 0.75),
+  q               = c(0.197517, 0.5090928, 0.2124225, 0.4953055, 0.0892906, 4.3494e-05), #rep(0.2, n_indices), OM$rep$q
+  use_indices     = rep(1, n_indices),
+  use_index_paa   = rep(1, n_indices),
+  units_indices   = rep(2, n_indices),
+  units_index_paa = rep(2, n_indices)
+)
+```
+
+Scaffold
+
+```{r}
+info <- SPASAM.MSE::generate_basic_info(
+  n_stocks = n_stocks,
+  n_regions = n_regions,
+  n_indices = n_indices,
+  n_fleets = n_fleets,
+  n_seasons = n_seasons,
+  base.years = year_start:year_end,
+  n_feedback_years = MSE_years,
+  n_ages = n_ages,
+  catch_info = catch_info,
+  index_info = index_info,
+  user_waa = user_waa,
+  user_maturity = user_maturity,
+  fracyr_spawn = fracyr_spawn
+)
+
+basic_info     <- info$basic_info
+catch_info_use <- info$catch_info
+index_info_use <- info$index_info
+```
+
+Initialize F
+
+```{r}
+F_info <- info$F
+F_info$F[1:n_hist_years, ] <- OM$rep$Fbar[1:n_hist_years, drop = FALSE]
+```
+
+Selectivity, M, and process in OM, STILL WORKING ON THIS
+
+```{r}
+sel3 <- list(
+  model = rep("age-specific", 8), # 2 selectivity blocks for fishery, how to deal with here?
+  re    = c("ar1_y", "none", "none", "none"),
+  initial_pars = list(
+    c(0.01665252, 0.1994395, 0.6751271,    1, 0.6039584),
+    c(0.004589983, 0.09634877, 0.4255508,    1, 0.5450962),
+    c(1, 0.5879402, 0.6179548, 0.1687678, 0.05946685),
+    c(1, 0.850923, 0.7722096, 0.391161, 0.056252),
+    c(1,    1, 0.4837531, 0.290685, 0.07789516),
+    c(0,    1, 0.3997233, 0.3843249, 0.2045156),
+    c(0.03848512,    1,    1, 0.7092893, 0.4966039),
+    c(1,    0,    0,    0,   0)
+  ),
+  fix_pars = list(c(4:6), NULL, NULL, NULL)
+)
+
+# OM$input$data$selblock_pointer_fleets has selectivity years for fishery
+
+M <- list(
+  model = "constant",
+  initial_means = array(
+    c(0.57, 0.33, 0.26, 0.23, 0.22, 0.22),
+    dim = c(n_stocks, n_regions, n_ages)
+  )
+)
+
+sigma_vals <- array(0, dim = c(n_stocks, n_regions, n_ages))
+sigma_vals[, , 1] <- exp(OM$parList$log_NAA_sigma[, , 1])
+sigma_vals[, , 2:n_ages] <- exp(OM$parList$log_NAA_sigma[, , 2:n_ages])
+
+recruit_pars_use <- exp(as.numeric(OM$parList$mean_rec_pars[1, ]))
+
+NAA_re <- list(
+  N1_model      = rep("age-specific-fe", n_stocks),
+  sigma         = rep("rec+1", n_stocks),
+  cor           = rep("iid", n_stocks),
+  recruit_model = 3,
+  recruit_pars  = list(recruit_pars_use),
+  sigma_vals    = sigma_vals
+)
+```
 
 
 ## Simpler not from assessment
