@@ -361,7 +361,7 @@ user_waa$waa_pointer_indices  <- OM$input$data$waa_pointer_indices
 user_waa$waa_pointer_totcatch <- OM$input$data$waa_pointer_totcatch
 user_waa$waa_pointer_ssb      <- OM$input$data$waa_pointer_ssb
 user_waa$waa_pointer_M        <- OM$input$data$waa_pointer_M # this is null in input but gets set equal to waa_pointer_ssb anyway
-# all of these get overwritten anyway
+# all of these get overwritten anyway, hardcoded in SPASAM.MSE::generate_basic_info
 
 ```
 
@@ -440,7 +440,7 @@ Selectivity, M, and process in OM
 
 ```{r}
 sel3 <- list(
-  n_selblocks = OM$input$data$n_selblocks,
+  n_selblocks = OM$input$data$n_selblocks, # added
   model = rep("age-specific", 8), # 2 selectivity blocks for fishery, how to deal with here?
   re    = rep("none", 8),
   initial_pars = list(
@@ -484,8 +484,6 @@ NAA_re <- list(
 
 Now trying to make the OM
 
-# Got to here
-
 The block below throws an error copied below
 
 --Creating input---------------------------------------------------------------------------------------------------------------------
@@ -503,6 +501,8 @@ set_WAA(input, waa_opts)
 wham::prepare_wham_input(basic_info = basic_info, selectivity = sel3,
 M = M, NAA_re = NAA_re, catch_info = catch_info_use, index_info = index_info_use,
 F = F_info, age_comp = "logistic-normal-pool0")
+
+In order to fix this I had to add the two lines below setting basic_info$waa_pointer_ssb and M to NULL; they do get added back later
 
 ```{r}
 
@@ -589,6 +589,21 @@ om_input_P <- SPASAM.MSE::update_input_index_info(
 ```
 
 Now compile projection OM, fingers crossed
+
+# Got to here
+
+Seems like a blessing, just an error not an R bomb:
+
+Error in getParameterOrder(data, parameters, new.env(), DLL = DLL) : 
+  Error when reading the variable: 'catch_paa_pars'. Please check data and parameters.
+3.
+getParameterOrder(data, parameters, new.env(), DLL = DLL)
+2.
+TMB::MakeADFun(input$data, input$par, DLL = "wham", random = input$random,
+map = input$map, silent = MakeADFun.silent)
+1.
+fit_wham(om_input_P, do.fit = FALSE, do.brps = FALSE, MakeADFun.silent = TRUE)
+
 
 ```{r}
 om_input_P$data$do_simulate_N_re <- 1L
