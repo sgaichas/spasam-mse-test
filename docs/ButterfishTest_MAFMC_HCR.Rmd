@@ -98,17 +98,17 @@ Historical model
 Bio inputs
 
 ```{r}
-user_maturity_hist <- array(NA_real_, dim = c(n_stocks, n_hist_years, n_ages))
-user_maturity_hist[, 1:n_hist_years, ] <- input$data$mature
-
-user_waa_hist <- list()
-user_waa_hist$waa <- array(NA_real_, dim = c(2, n_hist_years, n_ages))
-user_waa_hist$waa[, 1:n_hist_years, ] <- input$data$waa
-user_waa_hist$waa_pointer_fleets   <- input$data$waa_pointer_fleets
-user_waa_hist$waa_pointer_indices  <- input$data$waa_pointer_indices[-1] #there are 6 indices and 7 here?
-user_waa_hist$waa_pointer_totcatch <- input$data$waa_pointer_totcatch
-user_waa_hist$waa_pointer_ssb      <- input$data$waa_pointer_ssb
-user_waa_hist$waa_pointer_M        <- input$data$waa_pointer_M
+# user_maturity_hist <- array(NA_real_, dim = c(n_stocks, n_hist_years, n_ages))
+# user_maturity_hist[, 1:n_hist_years, ] <- input$data$mature
+# 
+# user_waa_hist <- list()
+# user_waa_hist$waa <- array(NA_real_, dim = c(2, n_hist_years, n_ages))
+# user_waa_hist$waa[, 1:n_hist_years, ] <- input$data$waa
+# user_waa_hist$waa_pointer_fleets   <- input$data$waa_pointer_fleets
+# user_waa_hist$waa_pointer_indices  <- input$data$waa_pointer_indices[-1] #there are 6 indices and 7 here?
+# user_waa_hist$waa_pointer_totcatch <- input$data$waa_pointer_totcatch
+# user_waa_hist$waa_pointer_ssb      <- input$data$waa_pointer_ssb
+# user_waa_hist$waa_pointer_M        <- input$data$waa_pointer_M
 
 fracyr_spawn <- input$asap3$fracyr_spawn #gb_dat[[1]]$dat$fracyr_spawn
 ```
@@ -116,23 +116,23 @@ fracyr_spawn <- input$asap3$fracyr_spawn #gb_dat[[1]]$dat$fracyr_spawn
 Catch and index observation settings
 
 ```{r}
-catch_info_hist <- list(
-  catch_cv      = 0.3,
-  catch_Neff    = 41,
-  use_agg_catch = 1,
-  use_catch_paa = 1
-)
-
-index_info_hist <- list(
-  index_cv        = c(0.4699923, 0.5389348, 0.6166915, 0.5313571, 0.7573711, 0.3517145), #rep(0.5, n_indices),
-  index_Neff      = c(10.967742,  4.838710,  1.677419,  4.967742,  1.064516, 0.000000), #rep(25, n_indices),
-  fracyr_indices  = c(0.75, 0.75, 0.75, 0.25, 0.3333333, 0.75),
-  q               = rep(0.2, n_indices),
-  use_indices     = rep(1, n_indices),
-  use_index_paa   = rep(1, n_indices),
-  units_indices   = rep(2, n_indices),
-  units_index_paa = rep(2, n_indices)
-)
+# catch_info_hist <- list(
+#   catch_cv      = 0.3,
+#   catch_Neff    = 41,
+#   use_agg_catch = 1,
+#   use_catch_paa = 1
+# )
+# 
+# index_info_hist <- list(
+#   index_cv        = c(0.4699923, 0.5389348, 0.6166915, 0.5313571, 0.7573711, 0.3517145), #rep(0.5, n_indices),
+#   index_Neff      = c(10.967742,  4.838710,  1.677419,  4.967742,  1.064516, 0.000000), #rep(25, n_indices),
+#   fracyr_indices  = c(0.75, 0.75, 0.75, 0.25, 0.3333333, 0.75),
+#   q               = rep(0.2, n_indices),
+#   use_indices     = rep(1, n_indices),
+#   use_index_paa   = rep(1, n_indices),
+#   units_indices   = rep(2, n_indices),
+#   units_index_paa = rep(2, n_indices)
+# )
 ```
 
 Alternatively take from the assessment? No, the dimensioning is wrong for SPASAM.MSE but I think the indices will break without year specific use indices flags--wait that gets fixed below
@@ -141,21 +141,21 @@ Alternatively take from the assessment? No, the dimensioning is wrong for SPASAM
 
 # from  https://timjmiller.github.io/wham/articles/ex13_no_ASAP.html
 
-basic_info_hist <- list(
-    n_stocks = 1L,
-    n_seasons = 1L,
-    n_fleets = 1L,
-    ages = 1:input$data$n_ages,
-    n_fleets = input$data$n_fleets,
-    fracyr_SSB = cbind(input$data$fracyr_SSB), #(n_years x n_stocks)
-    maturity = input$data$mature, #(n_stocks x n_years x n_ages)
-    years = as.integer(input$years), #(n_years)
-    waa = input$data$waa, #(any no. x n_years x n_ages)
-    waa_pointer_ssb = input$data$waa_pointer_ssb, #(n_stocks)
-    spawn_regions = 1, #(n_stocks)
-    spawn_seasons = 1 #(n_stocks)
-)
-
+# basic_info_hist <- list(
+#     n_stocks = 1L,
+#     n_seasons = 1L,
+#     n_fleets = 1L,
+#     ages = 1:input$data$n_ages,
+#     n_fleets = input$data$n_fleets,
+#     fracyr_SSB = cbind(input$data$fracyr_SSB), #(n_years x n_stocks)
+#     maturity = input$data$mature, #(n_stocks x n_years x n_ages)
+#     years = as.integer(input$years), #(n_years)
+#     waa = input$data$waa, #(any no. x n_years x n_ages)
+#     waa_pointer_ssb = input$data$waa_pointer_ssb, #(n_stocks)
+#     spawn_regions = 1, #(n_stocks)
+#     spawn_seasons = 1 #(n_stocks)
+# )
+# 
 # catch_info_hist <- list(
 #     n_fleets = NCOL(input$data$agg_catch), #(n_fleets)
 #     agg_catch = cbind(input$data$agg_catch), #(n_years x n_fleets)
@@ -191,34 +191,34 @@ basic_info_hist <- list(
 Build the model scaffold
 
 ```{r}
-info_hist <- SPASAM.MSE::generate_basic_info(
-  n_stocks = n_stocks,
-  n_regions = n_regions,
-  n_indices = n_indices,
-  n_fleets = n_fleets,
-  n_seasons = n_seasons,
-  base.years = year_start:year_end,
-  n_feedback_years = 0L,
-  n_ages = n_ages,
-  catch_info = catch_info_hist,
-  index_info = index_info_hist,
-  user_waa = user_waa_hist,
-  user_maturity = user_maturity_hist,
-  fracyr_spawn = fracyr_spawn,
-  life_history = "short"
-)
-
-#basic_info_hist     <- info_hist$basic_info
-catch_info_use_hist <- info_hist$catch_info
-index_info_use_hist <- info_hist$index_info
-F_info_hist         <- info_hist$F
-
-catch_info_use_hist$agg_catch[1:n_hist_years, ]     <- input$data$agg_catch
-catch_info_use_hist$catch_paa[, 1:n_hist_years, ]   <- input$data$catch_paa
-index_info_use_hist$agg_indices[1:n_hist_years, ]   <- input$data$agg_indices
-index_info_use_hist$index_paa[, 1:n_hist_years, ]   <- input$data$index_paa
-index_info_use_hist$use_indices[1:n_hist_years, ]   <- input$data$use_indices
-index_info_use_hist$use_index_paa[1:n_hist_years, ] <- input$data$use_index_paa
+# info_hist <- SPASAM.MSE::generate_basic_info(
+#   n_stocks = n_stocks,
+#   n_regions = n_regions,
+#   n_indices = n_indices,
+#   n_fleets = n_fleets,
+#   n_seasons = n_seasons,
+#   base.years = year_start:year_end,
+#   n_feedback_years = 0L,
+#   n_ages = n_ages,
+#   catch_info = catch_info_hist,
+#   index_info = index_info_hist,
+#   user_waa = user_waa_hist,
+#   user_maturity = user_maturity_hist,
+#   fracyr_spawn = fracyr_spawn,
+#   life_history = "short"
+# )
+# 
+# #basic_info_hist     <- info_hist$basic_info
+# catch_info_use_hist <- info_hist$catch_info
+# index_info_use_hist <- info_hist$index_info
+# F_info_hist         <- info_hist$F
+# 
+# catch_info_use_hist$agg_catch[1:n_hist_years, ]     <- input$data$agg_catch
+# catch_info_use_hist$catch_paa[, 1:n_hist_years, ]   <- input$data$catch_paa
+# index_info_use_hist$agg_indices[1:n_hist_years, ]   <- input$data$agg_indices
+# index_info_use_hist$index_paa[, 1:n_hist_years, ]   <- input$data$index_paa
+# index_info_use_hist$use_indices[1:n_hist_years, ]   <- input$data$use_indices
+# index_info_use_hist$use_index_paa[1:n_hist_years, ] <- input$data$use_index_paa
 ```
 
 Selectivity, M, etc
@@ -226,88 +226,88 @@ Selectivity, M, etc
 This is wrong, should be all age specific and iid I think to match the butterfish assessment, but this doesnt get used anyway
 
 ```{r}
-sel_hist <- list(
-  model = c("age-specific", "logistic", "logistic", "logistic", "logistic", "logistic", "logistic"),
-  re    = c("ar1_y", "none", "none", "none", "none", "none", "none"),
-  initial_pars = list(
-    c(0.1, 0.25, 0.5, 1, 1),
-    c(2, 0.3),
-    c(2, 0.3),
-    c(2, 0.3),
-    c(2, 0.3),
-    c(2, 0.3),
-    c(2, 0.3)
-
-  ),
-  fix_pars = list(c(4:6), NULL, NULL, NULL, NULL, NULL, NULL)
-)
-
-M_hist <- list(
-  model = "constant",
-  initial_means = array(
-    c(0.57, 0.33, 0.26, 0.23, 0.22),
-    dim = c(n_stocks, n_regions, n_ages)
-  )
-)
-
-sigma_vals_hist <- array(0, dim = c(n_stocks, n_regions, n_ages))
-sigma_vals_hist[, , 1] <- 0.5
-
-NAA_re_hist <- list(
-  N1_model      = rep("equilibrium", n_stocks),
-  sigma         = rep("rec", n_stocks),
-  cor           = rep("iid", n_stocks),
-  recruit_model = 2,
-  sigma_vals    = sigma_vals_hist
-)
+# sel_hist <- list(
+#   model = c("age-specific", "logistic", "logistic", "logistic", "logistic", "logistic", "logistic"),
+#   re    = c("ar1_y", "none", "none", "none", "none", "none", "none"),
+#   initial_pars = list(
+#     c(0.1, 0.25, 0.5, 1, 1),
+#     c(2, 0.3),
+#     c(2, 0.3),
+#     c(2, 0.3),
+#     c(2, 0.3),
+#     c(2, 0.3),
+#     c(2, 0.3)
+# 
+#   ),
+#   fix_pars = list(c(4:6), NULL, NULL, NULL, NULL, NULL, NULL)
+# )
+# 
+# M_hist <- list(
+#   model = "constant",
+#   initial_means = array(
+#     c(0.57, 0.33, 0.26, 0.23, 0.22),
+#     dim = c(n_stocks, n_regions, n_ages)
+#   )
+# )
+# 
+# sigma_vals_hist <- array(0, dim = c(n_stocks, n_regions, n_ages))
+# sigma_vals_hist[, , 1] <- 0.5
+# 
+# NAA_re_hist <- list(
+#   N1_model      = rep("equilibrium", n_stocks),
+#   sigma         = rep("rec", n_stocks),
+#   cor           = rep("iid", n_stocks),
+#   recruit_model = 2,
+#   sigma_vals    = sigma_vals_hist
+# )
 ```
 
 Prep and fit historical model
 
 ```{r}
-input_histfit <- prepare_wham_input(
-  basic_info  = basic_info_hist,
-  selectivity = sel_hist,
-  M           = M_hist,
-  NAA_re      = NAA_re_hist,
-  catch_info  = catch_info_use_hist,
-  index_info  = index_info_use_hist,
-  F           = F_info_hist,
-  age_comp    = "logistic-normal-pool0"
-)
-
-input_histfit <- update_waa(input_histfit, waa_info = info_hist$par_inputs$user_waa)
-
-input_e <- input #prepare_wham_input(gb_dat)
-input_histfit$data$agg_index_sigma[1:n_hist_years, ] <- input_e$data$agg_index_sigma
-input_histfit$data$use_indices[1:n_hist_years, ]     <- input_e$data$use_indices
-input_histfit$data$use_index_paa[1:n_hist_years, ]   <- input_e$data$use_index_paa
-
-generate_remove_years <- function(mat) {
-  lz <- lapply(seq_len(ncol(mat)), function(j) which(mat[, j] == 0))
-  if (all(lengths(lz) == 0)) return(NULL)
-  max_rows <- max(sapply(lz, length))
-  out <- matrix(NA_integer_, nrow = max_rows, ncol = length(lz))
-  for (j in seq_along(lz)) {
-    if (length(lz[[j]])) out[seq_along(lz[[j]]), j] <- lz[[j]]
-  }
-  out
-}
-
-remove_agg_years1 <- generate_remove_years(input_e$data$use_indices)
-remove_paa_years1 <- generate_remove_years(input_e$data$use_index_paa)
-
-input_histfit <- update_input_index_info(
-  input_histfit,
-  agg_index_sigma = input_histfit$data$agg_index_sigma,
-  index_Neff      = input_histfit$data$index_Neff,
-  remove_agg = TRUE,
-  remove_agg_pointer = 1:3,
-  remove_agg_years = remove_agg_years1,
-  remove_paa = TRUE,
-  remove_paa_pointer = 1:3,
-  remove_paa_years = remove_paa_years1
-)
+# input_histfit <- prepare_wham_input(
+#   basic_info  = basic_info_hist,
+#   selectivity = sel_hist,
+#   M           = M_hist,
+#   NAA_re      = NAA_re_hist,
+#   catch_info  = catch_info_use_hist,
+#   index_info  = index_info_use_hist,
+#   F           = F_info_hist,
+#   age_comp    = "logistic-normal-pool0"
+# )
+# 
+# input_histfit <- update_waa(input_histfit, waa_info = info_hist$par_inputs$user_waa)
+# 
+# input_e <- input #prepare_wham_input(gb_dat)
+# input_histfit$data$agg_index_sigma[1:n_hist_years, ] <- input_e$data$agg_index_sigma
+# input_histfit$data$use_indices[1:n_hist_years, ]     <- input_e$data$use_indices
+# input_histfit$data$use_index_paa[1:n_hist_years, ]   <- input_e$data$use_index_paa
+# 
+# generate_remove_years <- function(mat) {
+#   lz <- lapply(seq_len(ncol(mat)), function(j) which(mat[, j] == 0))
+#   if (all(lengths(lz) == 0)) return(NULL)
+#   max_rows <- max(sapply(lz, length))
+#   out <- matrix(NA_integer_, nrow = max_rows, ncol = length(lz))
+#   for (j in seq_along(lz)) {
+#     if (length(lz[[j]])) out[seq_along(lz[[j]]), j] <- lz[[j]]
+#   }
+#   out
+# }
+# 
+# remove_agg_years1 <- generate_remove_years(input_e$data$use_indices)
+# remove_paa_years1 <- generate_remove_years(input_e$data$use_index_paa)
+# 
+# input_histfit <- update_input_index_info(
+#   input_histfit,
+#   agg_index_sigma = input_histfit$data$agg_index_sigma,
+#   index_Neff      = input_histfit$data$index_Neff,
+#   remove_agg = TRUE,
+#   remove_agg_pointer = 1:3,
+#   remove_agg_years = remove_agg_years1,
+#   remove_paa = TRUE,
+#   remove_paa_pointer = 1:3,
+#   remove_paa_years = remove_paa_years1
+# )
 
 # om_file <- system.file("extdata", "OM.RDS", package = "SPASAM.MSE")
 # 
@@ -360,7 +360,9 @@ user_waa$waa_pointer_fleets   <- OM$input$data$waa_pointer_fleets
 user_waa$waa_pointer_indices  <- OM$input$data$waa_pointer_indices
 user_waa$waa_pointer_totcatch <- OM$input$data$waa_pointer_totcatch
 user_waa$waa_pointer_ssb      <- OM$input$data$waa_pointer_ssb
-user_waa$waa_pointer_M        <- OM$input$data$waa_pointer_M
+user_waa$waa_pointer_M        <- OM$input$data$waa_pointer_M # this is null in input but gets set equal to waa_pointer_ssb anyway
+# all of these get overwritten anyway
+
 ```
 
 Catch and index, may have the same issue as above, see if year specific will work later
@@ -438,8 +440,9 @@ Selectivity, M, and process in OM
 
 ```{r}
 sel3 <- list(
+  n_selblocks = OM$input$data$n_selblocks,
   model = rep("age-specific", 8), # 2 selectivity blocks for fishery, how to deal with here?
-  re    = rep("iid", 8),
+  re    = rep("none", 8),
   initial_pars = list(
     c(0.01665252, 0.1994395, 0.6751271,    1, 0.6039584),
     c(0.004589983, 0.09634877, 0.4255508,    1, 0.5450962),
@@ -450,7 +453,7 @@ sel3 <- list(
     c(0.03848512,    1,    1, 0.7092893, 0.4966039),
     c(1,    0,    0,    0,   0)
   ),
-  fix_pars = list(rep(NULL, 8))
+  fix_pars = list(4, 4, 1, 1, 1:2, 1, 2:3, 1) # fix at least one at 1 for age specific
 )
 
 # OM$input$data$selblock_pointer_fleets has selectivity years for fishery
@@ -502,6 +505,11 @@ M = M, NAA_re = NAA_re, catch_info = catch_info_use, index_info = index_info_use
 F = F_info, age_comp = "logistic-normal-pool0")
 
 ```{r}
+
+# will this fix error?
+basic_info$waa_pointer_ssb <- NULL
+basic_info$waa_pointer_M <- NULL
+
 om_input_P <- wham::prepare_wham_input(
   basic_info  = basic_info,
   selectivity = sel3,
@@ -521,7 +529,7 @@ om_input_P$par$index_paa_pars <- OM$parList$index_paa_pars
 om_input_P$par$sel_repars     <- OM$parList$sel_repars
 
 for (i in 1:n_regions) {
-  om_input_P$par$log_N1[i, i, ] <- log(OM$rep$N1)[i, i, ]
+  om_input_P$par$log_N1[i, i, ] <- log(OM$rep$NAA[i, 1])  #log(OM$rep$N1)[i, i, ]
 }
 
 om_input_P$data$agg_index_sigma[1:n_hist_years, ] <- input_hist$data$agg_index_sigma
@@ -531,6 +539,66 @@ om_input_P$data$use_index_paa[1:n_hist_years, ]   <- input_hist$data$use_index_p
 for (iy in (n_hist_years + 1L):n_proj_years) {
   om_input_P$data$agg_index_sigma[iy, ] <- input_hist$data$agg_index_sigma[n_hist_years, ]
 }
+```
+
+Now adding back indices with years to use, danger
+
+```{r}
+loc_zeros_agg <- lapply(seq_len(ncol(input_hist$data$use_indices)), function(j) {
+  which(input_hist$data$use_indices[, j] == 0)
+})
+
+loc_zeros_paa <- lapply(seq_len(ncol(input_hist$data$use_index_paa)), function(j) {
+  which(input_hist$data$use_index_paa[, j] == 0)
+})
+
+max_agg <- max(sapply(loc_zeros_agg, length))
+max_paa <- max(sapply(loc_zeros_paa, length))
+
+remove_agg_years1 <- if (max_agg > 0) {
+  out <- matrix(NA_integer_, nrow = max_agg, ncol = length(loc_zeros_agg))
+  for (j in seq_along(loc_zeros_agg)) {
+    if (length(loc_zeros_agg[[j]])) {
+      out[seq_along(loc_zeros_agg[[j]]), j] <- loc_zeros_agg[[j]]
+    }
+  }
+  out
+} else NULL
+
+remove_paa_years1 <- if (max_paa > 0) {
+  out <- matrix(NA_integer_, nrow = max_paa, ncol = length(loc_zeros_paa))
+  for (j in seq_along(loc_zeros_paa)) {
+    if (length(loc_zeros_paa[[j]])) {
+      out[seq_along(loc_zeros_paa[[j]]), j] <- loc_zeros_paa[[j]]
+    }
+  }
+  out
+} else NULL
+
+om_input_P <- SPASAM.MSE::update_input_index_info(
+  om_input_P,
+  agg_index_sigma = om_input_P$data$agg_index_sigma,
+  index_Neff      = om_input_P$data$index_Neff,
+  remove_agg = TRUE,
+  remove_agg_pointer = 1:3,
+  remove_agg_years = remove_agg_years1,
+  remove_paa = TRUE,
+  remove_paa_pointer = 1:3,
+  remove_paa_years = remove_paa_years1
+)
+```
+
+Now compile projection OM, fingers crossed
+
+```{r}
+om_input_P$data$do_simulate_N_re <- 1L
+
+unfitted_om_P <- fit_wham(
+  om_input_P,
+  do.fit = FALSE,
+  do.brps = FALSE,
+  MakeADFun.silent = TRUE
+)
 ```
 
 
