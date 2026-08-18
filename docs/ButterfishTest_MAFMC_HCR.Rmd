@@ -427,6 +427,14 @@ info <- SPASAM.MSE::generate_basic_info(
 basic_info     <- info$basic_info
 catch_info_use <- info$catch_info
 index_info_use <- info$index_info
+
+catch_info_use$agg_catch[1:n_hist_years, ]     <- input$data$agg_catch
+catch_info_use$catch_paa[, 1:n_hist_years, ]   <- input$data$catch_paa
+index_info_use$agg_indices[1:n_hist_years, ]   <- input$data$agg_indices
+index_info_use$index_paa[, 1:n_hist_years, ]   <- input$data$index_paa
+# index_info_use_hist$use_indices[1:n_hist_years, ]   <- input$data$use_indices
+# index_info_use_hist$use_index_paa[1:n_hist_years, ] <- input$data$use_index_paa
+
 ```
 
 Initialize F
@@ -518,14 +526,14 @@ om_input_P <- wham::prepare_wham_input(
   catch_info  = catch_info_use,
   index_info  = index_info_use,
   F           = F_info,
-  age_comp    = "logistic-normal-pool0"
+  age_comp    = "multinomial"
 )
 
 waa_info <- info$par_inputs$user_waa
 om_input_P <- SPASAM.MSE::update_waa(om_input_P, waa_info = waa_info)
 
-om_input_P$par$catch_paa_pars <- OM$parList$catch_paa_pars
-om_input_P$par$index_paa_pars <- OM$parList$index_paa_pars
+om_input_P$par$catch_paa_pars <- OM$parList$catch_paa_pars <- matrix(0, basic_info$n_fleets, 3) #these were not in the OM
+om_input_P$par$index_paa_pars <- OM$parList$index_paa_pars <- matrix(0, basic_info$n_indices, 3) #these were not in the OM
 om_input_P$par$sel_repars     <- OM$parList$sel_repars
 
 for (i in 1:n_regions) {
@@ -580,17 +588,15 @@ om_input_P <- SPASAM.MSE::update_input_index_info(
   agg_index_sigma = om_input_P$data$agg_index_sigma,
   index_Neff      = om_input_P$data$index_Neff,
   remove_agg = TRUE,
-  remove_agg_pointer = 1:3,
+  remove_agg_pointer = 1:6,
   remove_agg_years = remove_agg_years1,
   remove_paa = TRUE,
-  remove_paa_pointer = 1:3,
+  remove_paa_pointer = 1:6,
   remove_paa_years = remove_paa_years1
 )
 ```
 
 Now compile projection OM, fingers crossed
-
-# Got to here
 
 Seems like a blessing, just an error not an R bomb:
 
@@ -603,6 +609,14 @@ TMB::MakeADFun(input$data, input$par, DLL = "wham", random = input$random,
 map = input$map, silent = MakeADFun.silent)
 1.
 fit_wham(om_input_P, do.fit = FALSE, do.brps = FALSE, MakeADFun.silent = TRUE)
+
+# Got to here
+
+Fixed the error above and a susequent one for index_paa_pars by adding the matrices in lines 535-536
+
+And NOW it blows up on fit_wham
+
+progress?
 
 
 ```{r}
