@@ -464,7 +464,9 @@ sel3 <- list(
   fix_pars = list(4, 4, 1, 1, 1:2, 1, 2:3, 1) # fix at least one at 1 for age specific
 )
 
-# OM$input$data$selblock_pointer_fleets has selectivity years for fishery
+# OM$input$data$selblock_pointer_fleets has selectivity years for fishery, added
+
+catch_info_use$selblock_pointer_fleets <- OM$input$data$selblock_pointer_fleets
 
 M <- list(
   model = "constant",
@@ -612,7 +614,7 @@ fit_wham(om_input_P, do.fit = FALSE, do.brps = FALSE, MakeADFun.silent = TRUE)
 
 # Got to here
 
-Fixed the error above and a susequent one for index_paa_pars by adding the matrices in lines 535-536
+Fixed the error above and a subsequent one for index_paa_pars by adding the matrices in lines 535-536
 
 And NOW it blows up on fit_wham
 
