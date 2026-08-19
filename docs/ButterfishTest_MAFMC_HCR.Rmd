@@ -35,19 +35,24 @@ This is all modified for butterfish-ish
 
 All I could find were the 2022 RT models online in the SASI portal [here](https://apps-nefsc.fisheries.noaa.gov/saw/sasi_files.php?year=2022&species_id=16&stock_id=6&review_type_id=5&info_type_id=3&map_type_id=&filename=WHAM_models.zip). MT assessment should really include access to input data, models, and all model outputs for full transparency...
 
-Read in the 2022 models
+Chuck kindly sent the 2024 MT outputs when I requested them; and converted them to multi-wham so maybe this will be smoother now?
+
+Read in the models (2024 MT in WHAM 2.0)
 
 ```{r}
-buttermods <- readRDS(here::here("./assessments/Butterfish2022_WHAM_models/mods.rds"))
+# buttermods <- readRDS(here::here("./assessments/Butterfish2022_WHAM_models/mods.rds"))
+# 
+# buttermods[[1]]$model_name
+# buttermods[[2]]$model_name
+# buttermods[[3]]$model_name
+# 
+# base2022 <- buttermods[[1]] # ASAP in WHAM
+# recdev2022 <- buttermods[[2]] # This with only rec RE may be closer to the example from the vignette
+# NAAmod2022 <- buttermods[[3]] # This is the preferred model with NAA RE
 
-buttermods[[1]]$model_name
-buttermods[[2]]$model_name
-buttermods[[3]]$model_name
+buttermod <- readRDS(here::here("./assessments/Butterfish2022_WHAM_models/naa5_2024MT_multiwham.rds"))
 
-base2022 <- buttermods[[1]] # ASAP in WHAM
-recdev2022 <- buttermods[[2]] # This with only rec RE may be closer to the example from the vignette
-NAAmod2022 <- buttermods[[3]] # This is the preferred model with NAA RE
-
+buttermod$wham_version
 ```
 
 Can I use these as a basis? Follow https://lichengxue.github.io/SPASAM.MSE/Use-Actual-Stock-Assessment.html 
@@ -58,8 +63,8 @@ Global settings
 
 ```{r}
 
-input_hist <- recdev2022$input #prepare_wham_input(gb_dat)
-input      <- recdev2022$input #prepare_wham_input(gb_dat)
+input_hist <- buttermod$input #prepare_wham_input(gb_dat)
+input      <- buttermod$input #prepare_wham_input(gb_dat)
 
 n_stocks  <- 1L
 n_regions <- 1L
@@ -68,9 +73,9 @@ n_indices <- 6L # NAAmod2022$input$data$n_indices is 6
 n_fleets  <- 1L # NAAmod2022$input$data$n_fleets is 1
 n_seasons <- 1L
 
-# butterfish RT assessment start and end data years NAAmod2022$years
+# butterfish RT assessment start and end data years NAAmod2022$years, updated for 2024 MT
 year_start  <- 1989L
-year_end    <- 2019L
+year_end    <- 2023L
 MSE_years   <- 9L # 3 3yr assessment cycles
 
 n_hist_years <- year_end - year_start + 1L
@@ -89,7 +94,7 @@ assess_years <- seq(
 
 # Historical period is fixed.
 # Only years from first_free_year onward are allowed to vary.
-first_free_year <- 33L # example has last-first year + assess interval
+first_free_year <- 37L # example has last-first year + assess interval
 
 ```
 
@@ -110,7 +115,7 @@ Bio inputs
 # user_waa_hist$waa_pointer_ssb      <- input$data$waa_pointer_ssb
 # user_waa_hist$waa_pointer_M        <- input$data$waa_pointer_M
 
-fracyr_spawn <- input$asap3$fracyr_spawn #gb_dat[[1]]$dat$fracyr_spawn
+fracyr_spawn <- input$asap3[[1]]$fracyr_spawn #gb_dat[[1]]$dat$fracyr_spawn
 ```
 
 Catch and index observation settings
@@ -333,24 +338,24 @@ Prep and fit historical model
 
 # could the initial OM not be the fitted model?
 
-OM <- recdev2022
+OM <- buttermod
 
 check_convergence(OM)
 ```
 
-Now try using the original model as is and extending to projections. changed some dims here (waa from 5 in the example to 2)
+Now try using the original model as is and extending to projections. Go back to Cheng's code (not changing some dims here (waa from 5 in the example to 2))
 
 Throws an error on the set_WAA step which may be due to this
 
 ```{r}
 user_maturity <- array(NA_real_, dim = c(n_stocks, n_proj_years, n_ages))
-user_maturity[, 1:n_hist_years, ] <- OM$input$data$mature #[, 1:n_hist_years, ]
+user_maturity[, 1:n_hist_years, ] <- OM$input$data$mature[, 1:n_hist_years, ]
 for (iy in (n_hist_years + 1L):n_proj_years) {
-  user_maturity[, iy, ] <- OM$input$data$mature[n_hist_years, , drop = FALSE] #[, n_hist_years, , drop = FALSE]
+  user_maturity[, iy, ] <- OM$input$data$mature[, n_hist_years, , drop = FALSE]
 }
 
 user_waa <- list()
-user_waa$waa <- array(NA_real_, dim = c(2, n_proj_years, n_ages))
+user_waa$waa <- array(NA_real_, dim = c(8, n_proj_years, n_ages))
 user_waa$waa[, 1:n_hist_years, ] <- OM$input$data$waa[, 1:n_hist_years, ]
 for (iy in (n_hist_years + 1L):n_proj_years) {
   user_waa$waa[, iy, ] <- OM$input$data$waa[, n_hist_years, , drop = FALSE]
@@ -387,19 +392,19 @@ Catch and index, may have the same issue as above, see if year specific will wor
 # )
 
 catch_info <- list(
-  catch_cv      = 0.3,
-  catch_Neff    = 41,
+  catch_cv      = 0.2623537, #mean(input$data$agg_catch_sigma)
+  catch_Neff    = 43, #input$data$catch_Neff
   use_agg_catch = 1,
   use_catch_paa = 1
 )
 
 index_info <- list(
-  index_cv        = c(0.4699923, 0.5389348, 0.6166915, 0.5313571, 0.7573711, 0.3517145), #rep(0.5, n_indices),
-  index_Neff      = c(10.967742,  4.838710,  1.677419,  4.967742,  1.064516, 0.000000), #rep(25, n_indices),
-  fracyr_indices  = c(0.75, 0.75, 0.75, 0.25, 0.3333333, 0.75),
-  q               = c(0.197517, 0.5090928, 0.2124225, 0.4953055, 0.0892906, 4.3494e-05), #rep(0.2, n_indices), OM$rep$q
+  index_cv        = c(0.5010909, 0.5451420, 0.5038754, 0.5337914, 0.6915221, 0.3634754), #rep(0.5, n_indices), colMeans(input$data$agg_index_sigma)
+  index_Neff      = c(20,  17,  5,  24,  3, 0), #rep(25, n_indices), took constants for each index in input$data$index_Neff
+  fracyr_indices  = c(0.75, 0.75, 0.75, 0.25, 0.3333333, 0.75), #input$data$fracyr_indices
+  q               = c(0.197517, 0.523248, 0.1647172, 0.464651, 0.1039347, 3.424289e-05), #rep(0.2, n_indices), OM$rep$q
   use_indices     = rep(1, n_indices),
-  use_index_paa   = rep(1, n_indices),
+  use_index_paa   = c(rep(1, n_indices-1), 0),
   units_indices   = rep(2, n_indices),
   units_index_paa = rep(2, n_indices)
 )
@@ -449,19 +454,19 @@ Selectivity, M, and process in OM
 ```{r}
 sel3 <- list(
   n_selblocks = OM$input$data$n_selblocks, # added
-  model = rep("age-specific", 8), # 2 selectivity blocks for fishery, how to deal with here?
-  re    = rep("none", 8),
-  initial_pars = list(
-    c(0.01665252, 0.1994395, 0.6751271,    1, 0.6039584),
-    c(0.004589983, 0.09634877, 0.4255508,    1, 0.5450962),
-    c(1, 0.5879402, 0.6179548, 0.1687678, 0.05946685),
-    c(1, 0.850923, 0.7722096, 0.391161, 0.056252),
-    c(1,    1, 0.4837531, 0.290685, 0.07789516),
-    c(0,    1, 0.3997233, 0.3843249, 0.2045156),
-    c(0.03848512,    1,    1, 0.7092893, 0.4966039),
+  model = rep("age-specific", 8), #input$data$selblock_models = 1 for all
+  re    = rep("none", 8), #input$data$selblock_models_re = 1 for all
+  initial_pars = list( #from OM$rep$selAA
+    c(0.013508, 0.1829535, 0.642894,    1, 0.532285),
+    c(0.003615705, 0.06812128, 0.3757382,    1, 0.5632194),
+    c(1, 0.5265157, 0.4638104, 0.102919, 0.05952474),
+    c(1, 0.6590912, 0.7439251, 0.4416134, 0.09534809),
+    c(1,    1, 0.0836746, 0.05080942, 0.06792671),
+    c(0,    1, 0.4274524, 0.5378442, 0.2198267),
+    c(0.0221619,    1,    1, 0.07488138, 0.3999979),
     c(1,    0,    0,    0,   0)
   ),
-  fix_pars = list(4, 4, 1, 1, 1:2, 1, 2:3, 1) # fix at least one at 1 for age specific
+  fix_pars = list(4, 4, 1, 1, 1:2, 1:2, 2, 1:5) # fix at least one at 1 for age specific
 )
 
 # OM$input$data$selblock_pointer_fleets has selectivity years for fishery, added
@@ -471,16 +476,16 @@ catch_info_use$selblock_pointer_fleets <- OM$input$data$selblock_pointer_fleets
 M <- list(
   model = "constant",
   initial_means = array(
-    c(0.2452964, 0.2452964, 0.2452964, 0.2452964, 0.2452964),
+    c(1.278, 1.278, 1.278, 1.278, 1.278),
     dim = c(n_stocks, n_regions, n_ages)
   )
 )
 
 sigma_vals <- array(0, dim = c(n_stocks, n_regions, n_ages))
-sigma_vals[, , 1] <- exp(OM$parList$log_NAA_sigma) #[, , 1])
-sigma_vals[, , 2:n_ages] <- exp(OM$parList$log_NAA_sigma) #[, , 2:n_ages])
+sigma_vals[, , 1] <- exp(OM$parList$log_NAA_sigma[, , 1])
+sigma_vals[, , 2:n_ages] <- exp(OM$parList$log_NAA_sigma[, , 2:n_ages])
 
-recruit_pars_use <- exp(as.numeric(OM$parList$mean_rec_pars)) #[1, ]))
+recruit_pars_use <- exp(as.numeric(OM$parList$mean_rec_pars[1, ]))
 
 NAA_re <- list(
   N1_model      = rep("age-specific-fe", n_stocks),
@@ -494,6 +499,9 @@ NAA_re <- list(
 
 Now trying to make the OM
 
+None of this is true with a modern WHAM model, ignore
+
+```
 The block below throws an error copied below
 
 --Creating input---------------------------------------------------------------------------------------------------------------------
@@ -513,12 +521,13 @@ M = M, NAA_re = NAA_re, catch_info = catch_info_use, index_info = index_info_use
 F = F_info, age_comp = "logistic-normal-pool0")
 
 In order to fix this I had to add the two lines below setting basic_info$waa_pointer_ssb and M to NULL; they do get added back later
+```
 
 ```{r}
 
 # will this fix error?
-basic_info$waa_pointer_ssb <- NULL
-basic_info$waa_pointer_M <- NULL
+# basic_info$waa_pointer_ssb <- NULL
+# basic_info$waa_pointer_M <- NULL
 
 om_input_P <- wham::prepare_wham_input(
   basic_info  = basic_info,
@@ -534,12 +543,12 @@ om_input_P <- wham::prepare_wham_input(
 waa_info <- info$par_inputs$user_waa
 om_input_P <- SPASAM.MSE::update_waa(om_input_P, waa_info = waa_info)
 
-om_input_P$par$catch_paa_pars <- OM$parList$catch_paa_pars <- matrix(0, basic_info$n_fleets, 3) #these were not in the OM
-om_input_P$par$index_paa_pars <- OM$parList$index_paa_pars <- matrix(0, basic_info$n_indices, 3) #these were not in the OM
+om_input_P$par$catch_paa_pars <- OM$parList$catch_paa_pars #<- matrix(0, basic_info$n_fleets, 3) #these were not in the old OM
+om_input_P$par$index_paa_pars <- OM$parList$index_paa_pars #<- matrix(0, basic_info$n_indices, 3) #these were not in the old OM
 om_input_P$par$sel_repars     <- OM$parList$sel_repars
 
 for (i in 1:n_regions) {
-  om_input_P$par$log_N1[i, i, ] <- log(OM$rep$NAA[i, 1])  #log(OM$rep$N1)[i, i, ]
+  om_input_P$par$log_N1[i, i, ] <- log(OM$rep$N1)[i, i, ] #log(OM$rep$NAA[i, 1])  #for old model
 }
 
 om_input_P$data$agg_index_sigma[1:n_hist_years, ] <- input_hist$data$agg_index_sigma
@@ -600,6 +609,7 @@ om_input_P <- SPASAM.MSE::update_input_index_info(
 
 Now compile projection OM, fingers crossed
 
+```
 Seems like a blessing, just an error not an R bomb:
 
 Error in getParameterOrder(data, parameters, new.env(), DLL = DLL) : 
@@ -612,14 +622,12 @@ map = input$map, silent = MakeADFun.silent)
 1.
 fit_wham(om_input_P, do.fit = FALSE, do.brps = FALSE, MakeADFun.silent = TRUE)
 
-# Got to here
-
 Fixed the error above and a subsequent one for index_paa_pars by adding the matrices in lines 535-536
 
 And NOW it blows up on fit_wham
 
 progress?
-
+```
 
 ```{r}
 om_input_P$data$do_simulate_N_re <- 1L
