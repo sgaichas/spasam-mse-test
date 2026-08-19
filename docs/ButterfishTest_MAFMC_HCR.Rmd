@@ -100,6 +100,8 @@ first_free_year <- 37L # example has last-first year + assess interval
 
 Historical model
 
+I don't need most of this because I want to use the original assessment directly. 
+
 Bio inputs
 
 ```{r}
@@ -343,7 +345,10 @@ OM <- buttermod
 check_convergence(OM)
 ```
 
-Now try using the original model as is and extending to projections. Go back to Cheng's code (not changing some dims here (waa from 5 in the example to 2))
+
+### Extend assessment to do free projections
+
+Now try using the original model as is and extending to projections. Go back to Cheng's code (adjusted some dims here (waa from 5 in the example to 8))
 
 Throws an error on the set_WAA step which may be due to this
 
@@ -499,7 +504,7 @@ NAA_re <- list(
 
 Now trying to make the OM
 
-None of this is true with a modern WHAM model, ignore
+None of the below is true with a modern WHAM model, ignore
 
 ```
 The block below throws an error copied below
@@ -560,7 +565,7 @@ for (iy in (n_hist_years + 1L):n_proj_years) {
 }
 ```
 
-Now adding back indices with years to use, danger
+Now adding back indices with years to use, works now
 
 ```{r}
 loc_zeros_agg <- lapply(seq_len(ncol(input_hist$data$use_indices)), function(j) {
@@ -607,7 +612,7 @@ om_input_P <- SPASAM.MSE::update_input_index_info(
 )
 ```
 
-Now compile projection OM, fingers crossed
+Now compile projection OM, fingers crossed--works, it was all the old WHAM format causing issues
 
 ```
 Seems like a blessing, just an error not an R bomb:
@@ -638,6 +643,386 @@ unfitted_om_P <- fit_wham(
   do.brps = FALSE,
   MakeADFun.silent = TRUE
 )
+```
+
+Fix history, free future
+
+```{r}
+unfitted_om_P$input$random <- "log_NAA"
+unfitted_om_P$input$data$do_simulate_N_re <- 1L
+
+unfitted_om_P$input$par$log_N1 <- log(OM$rep$N1)
+if (!is.null(unfitted_om_P$parList$log_N1)) {
+  unfitted_om_P$parList$log_N1 <- log(OM$rep$N1)
+}
+
+hist_idx <- 1:(first_free_year - 3L) #subtract assess interval?
+unfitted_om_P$input$par$log_NAA[1, 1, hist_idx, ] <-
+  log(OM$rep$NAA[1, 1, hist_idx + 1L, ])
+
+if (!is.null(unfitted_om_P$parList$log_NAA)) {
+  unfitted_om_P$parList$log_NAA[1, 1, hist_idx, ] <-
+    log(OM$rep$NAA[1, 1, hist_idx + 1L, ])
+}
+```
+
+```{r}
+logNAA_dim <- dim(unfitted_om_P$input$par$log_NAA)
+future_idx_start <- first_free_year - 1L
+future_idx <- future_idx_start:logNAA_dim[3]
+
+m <- array(NA_integer_, dim = logNAA_dim)
+m[1, 1, future_idx, ] <- 1L
+m[!is.na(m)] <- seq_len(sum(!is.na(m)))
+
+unfitted_om_P$input$map$log_NAA <- factor(m)
+if (!is.null(unfitted_om_P$env$map)) {
+  unfitted_om_P$env$map$log_NAA <- unfitted_om_P$input$map$log_NAA
+}
+```
+
+```{r}
+last_fixed_idx <- first_free_year - 3L
+if (last_fixed_idx >= 1L) {
+  unfitted_om_P$input$par$log_NAA[1, 1, future_idx, ] <-
+    array(
+      unfitted_om_P$input$par$log_NAA[1, 1, last_fixed_idx, ],
+      dim = c(1, 1, length(future_idx), logNAA_dim[4])
+    )
+
+  if (!is.null(unfitted_om_P$parList$log_NAA)) {
+    unfitted_om_P$parList$log_NAA[1, 1, future_idx, ] <-
+      array(
+        unfitted_om_P$parList$log_NAA[1, 1, last_fixed_idx, ],
+        dim = c(1, 1, length(future_idx), logNAA_dim[4])
+      )
+  }
+}
+
+unfitted_om_P$parList$logit_selpars <- OM$parList$logit_selpars
+unfitted_om_P$parList$selpars_re    <- OM$parList$selpars_re
+```
+
+```{r}
+unfitted_om_P <- fit_wham(
+  unfitted_om_P$input,
+  do.fit = FALSE,
+  do.brps = FALSE,
+  MakeADFun.silent = TRUE
+)
+```
+
+Simulate the future
+
+```{r}
+seed <- 12345L
+
+om_future <- update_om_fn(
+  unfitted_om_P,
+  seed = seed,
+  random = "log_NAA",
+  process_fix = TRUE,
+  first_free_year = first_free_year
+)
+```
+
+### Check OM with free projection
+
+Check for fixed history: works!
+
+SSB
+
+```{r}
+plot(
+  om_future$rep$SSB,
+  type = "l",
+  main = "SSB with fixed history and simulated feedback period",
+  xlab = "Model year",
+  ylab = "SSB"
+)
+lines(1:n_hist_years, OM$rep$SSB[1:n_hist_years], col = "red", lwd = 2)
+
+legend(
+  "topright",
+  legend = c("Projected OM", "Fitted historical OM"),
+  col = c("black", "red"),
+  lwd = c(1, 2),
+  bty = "n"
+)
+```
+
+NAA comparisons (modified from original age 6, too old for butterfish, set to 3)
+
+```{r}
+s <- 1
+r <- 1
+hist_idx <- 1:(n_hist_years - 1L)
+
+layout(matrix(c(1,2,3), nrow = 3, byrow = TRUE))
+par(mar = c(4,4,2,1))
+
+# Extract series
+input_series <- exp(om_future$input$par$log_NAA[s, r, hist_idx, 1])
+fitted_series <- OM$rep$NAA[s, r, hist_idx + 1L, 1]
+
+# Panel 1 — overlay
+plot(hist_idx + 1, input_series,
+     type = "l",
+     lwd = 2,
+     xlab = "Model year",
+     ylab = "NAA age 1",
+     main = "Input vs Fitted (age 1)")
+lines(hist_idx + 1, fitted_series, col = "red", lwd = 2)
+legend("topright", c("Input", "Fitted"), col=c("black","red"), lty=1)
+
+# Panel 2 — difference
+plot(hist_idx + 1,
+     input_series - fitted_series,
+     type = "l",
+     xlab = "Model year",
+     ylab = "Difference",
+     main = "Input − Fitted")
+abline(h = 0, lty = 2)
+
+# Panel 3 — predicted NAA age 3
+plot(
+  om_future$rep$pred_NAA[s, r, , 3],
+  type = "l",
+  main = "Predicted Number at Age 3",
+  xlab = "Model year",
+  ylab = "Predicted NAA age 3"
+)
+abline(v = first_free_year, lty = 2, col = "red")
+```
+
+Rec devs
+
+```{r}
+par(mfrow = c(2, 1))
+
+# Recruitment deviations
+matplot(
+  om_future$rep$NAA_devs[, , , 1],
+  type = "l",
+  lty = 1,
+  col = rainbow(dim(om_future$rep$NAA_devs)[1]),
+  main = "Log Recruitment Deviations",
+  xlab = "Year",
+  ylab = "Value"
+)
+
+# Predicted recruitment
+matplot(
+  om_future$rep$pred_NAA[, , , 1],
+  type = "l",
+  lty = 1,
+  col = rainbow(dim(om_future$rep$pred_NAA)[1]),
+  main = "Predicted Recruitment",
+  xlab = "Year",
+  ylab = "Value"
+)
+
+par(mfrow = c(1,1))
+```
+
+Historical SSB is identical because I did not refit the model, just used 2024 MT as is. 
+
+```{r}
+hist_diff <- om_future$rep$NAA[, , 1:n_hist_years, ] -
+  OM$rep$NAA[, , 1:n_hist_years, ]
+print(hist_diff)
+
+plot(
+  om_future$rep$SSB[1:n_hist_years],
+  type = "l",
+  main = "Historical SSB comparison",
+  xlab = "Year index",
+  ylab = "SSB"
+)
+lines(OM$rep$SSB[1:n_hist_years], col = "red")
+```
+
+### Now try an MSE
+
+Assessment years and settings for EM, at first change only assessment interval to 3
+
+```{r}
+assess_interval <- 3L
+base_years      <- year_start:year_end
+terminal_year   <- tail(base_years, 1)
+
+assess_years <- seq(
+  terminal_year,
+  year_end + MSE_years - assess_interval,
+  by = assess_interval
+)
+
+NAA_re_em <- NAA_re
+NAA_re_em$N1_model <- "equilibrium"
+NAA_re_em$sigma    <- "rec"
+NAA_re_em$cor      <- "iid"
+
+update_catch_info_list <- list(
+  agg_catch_sigma = om_input_P$data$agg_catch_sigma,
+  catch_Neff      = om_input_P$data$catch_Neff
+)
+
+update_index_info_list <- list(
+  agg_index_sigma = om_input_P$data$agg_index_sigma,
+  index_Neff      = om_input_P$data$index_Neff,
+  remove_agg = TRUE,
+  remove_agg_pointer = 1:6,
+  remove_agg_years = remove_agg_years1,
+  remove_paa = TRUE,
+  remove_paa_pointer = 1:6,
+  remove_paa_years = remove_paa_years1
+)
+```
+
+HCR Type 1, 75% FXSPR
+
+```{r}
+hcr1 <- list(
+  hcr.type = 1,
+  hcr.opts = list(use_FXSPR = TRUE, percentFXSPR = 75)
+)
+
+# mod1_file <- system.file("extdata", "mod1.RDS", package = "SPASAM.MSE")
+# 
+# if (file.exists(mod1_file)) {
+#   
+#   mod1 <- readRDS(mod1_file)
+#   
+# } else {
+  
+  mod1 <- loop_through_fn(
+    om = om_future,
+    em_info = info,
+    random = "log_NAA",
+    M_em = M,
+    sel_em = sel3,
+    NAA_re_em = NAA_re_em,
+    age_comp_em = "logistic-normal-pool0",
+    em.opt = list(
+      separate.em = FALSE,
+      separate.em.type = 1,
+      do.move = FALSE,
+      est.move = FALSE
+    ),
+    update_index_info = update_index_info_list,
+    update_catch_info = update_catch_info_list,
+    assess_years = assess_years,
+    assess_interval = assess_interval,
+    base_years = base_years,
+    year.use = 35,
+    add.years = TRUE,
+    seed = 12345L,
+    hcr = hcr1,
+    save.sdrep = FALSE,
+    save.last.em = TRUE,
+    FXSPR_init = 0.5,
+    process_fix = TRUE,
+    first_free_year = 37
+  )
+  
+#}
+```
+
+HCR Type 1, 100% FXSPR
+
+```{r}
+hcr2 <- list(
+  hcr.type = 1,
+  hcr.opts = list(use_FXSPR = TRUE, percentFXSPR = 100)
+)
+
+# mod2_file <- system.file("extdata", "mod2.RDS", package = "SPASAM.MSE")
+# 
+# if (file.exists(mod2_file)) {
+#   
+#   mod2 <- readRDS(mod2_file)
+#   
+# } else {
+  
+  mod2 <- loop_through_fn(
+    om = om_future,
+    em_info = info,
+    random = "log_NAA",
+    M_em = M,
+    sel_em = sel3,
+    NAA_re_em = NAA_re_em,
+    age_comp_em = "logistic-normal-pool0",
+    em.opt = list(
+      separate.em = FALSE,
+      separate.em.type = 1,
+      do.move = FALSE,
+      est.move = FALSE
+    ),
+    update_index_info = update_index_info_list,
+    update_catch_info = update_catch_info_list,
+    assess_years = assess_years,
+    assess_interval = assess_interval,
+    base_years = base_years,
+    year.use = 35,
+    add.years = TRUE,
+    seed = 12345L,
+    hcr = hcr2,
+    save.sdrep = FALSE,
+    save.last.em = TRUE,
+    FXSPR_init = 0.5,
+    process_fix = TRUE,
+    first_free_year = 37
+  )
+  
+#}
+```
+
+Now try the MAFMC rule, HCR type 4
+
+```{r}
+hcr3 <- list(
+  hcr.type = 4,
+  hcr.opts = list(use_FXSPR = TRUE)
+)
+
+# mod2_file <- system.file("extdata", "mod2.RDS", package = "SPASAM.MSE")
+# 
+# if (file.exists(mod2_file)) {
+#   
+#   mod2 <- readRDS(mod2_file)
+#   
+# } else {
+  
+  mod3 <- loop_through_fn(
+    om = om_future,
+    em_info = info,
+    random = "log_NAA",
+    M_em = M,
+    sel_em = sel3,
+    NAA_re_em = NAA_re_em,
+    age_comp_em = "logistic-normal-pool0",
+    em.opt = list(
+      separate.em = FALSE,
+      separate.em.type = 1,
+      do.move = FALSE,
+      est.move = FALSE
+    ),
+    update_index_info = update_index_info_list,
+    update_catch_info = update_catch_info_list,
+    assess_years = assess_years,
+    assess_interval = assess_interval,
+    base_years = base_years,
+    year.use = 35,
+    add.years = TRUE,
+    seed = 12345L,
+    hcr = hcr3,
+    save.sdrep = FALSE,
+    save.last.em = TRUE,
+    FXSPR_init = 0.5,
+    process_fix = TRUE,
+    first_free_year = 37
+  )
+  
 ```
 
 
