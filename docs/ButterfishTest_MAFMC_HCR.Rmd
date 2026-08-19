@@ -90,7 +90,7 @@ assess_years <- seq(
 
 # Historical period is fixed.
 # Only years from first_free_year onward are allowed to vary.
-first_free_year <- 37L # example has last-first year + assess interval
+first_free_year <- 36L # year after last historical year
 
 ```
 
@@ -346,8 +346,6 @@ check_convergence(OM)
 
 Now try using the original model as is and extending to projections. Go back to Cheng's code (adjusted some dims here (waa from 5 in the example to 8))
 
-Throws an error on the set_WAA step which may be due to this
-
 ```{r}
 user_maturity <- array(NA_real_, dim = c(n_stocks, n_proj_years, n_ages))
 user_maturity[, 1:n_hist_years, ] <- OM$input$data$mature[, 1:n_hist_years, ]
@@ -434,12 +432,15 @@ basic_info     <- info$basic_info
 catch_info_use <- info$catch_info
 index_info_use <- info$index_info
 
+#catch_info_use$selblock_pointer_fleets[1:n_hist_years, ] <- input$data$selblock_pointer_fleets
+
 catch_info_use$agg_catch[1:n_hist_years, ]     <- input$data$agg_catch
 catch_info_use$catch_paa[, 1:n_hist_years, ]   <- input$data$catch_paa
+
 index_info_use$agg_indices[1:n_hist_years, ]   <- input$data$agg_indices
 index_info_use$index_paa[, 1:n_hist_years, ]   <- input$data$index_paa
-# index_info_use_hist$use_indices[1:n_hist_years, ]   <- input$data$use_indices
-# index_info_use_hist$use_index_paa[1:n_hist_years, ] <- input$data$use_index_paa
+#index_info_use$use_indices[1:n_hist_years, ]   <- input$data$use_indices #added later
+#index_info_use$use_index_paa[1:n_hist_years, ] <- input$data$use_index_paa #added later
 
 ```
 
@@ -471,8 +472,6 @@ sel3 <- list(
 )
 
 # OM$input$data$selblock_pointer_fleets has selectivity years for fishery, added
-
-catch_info_use$selblock_pointer_fleets <- OM$input$data$selblock_pointer_fleets
 
 M <- list(
   model = "constant",
@@ -552,12 +551,17 @@ for (i in 1:n_regions) {
   om_input_P$par$log_N1[i, i, ] <- log(OM$rep$N1)[i, i, ] #log(OM$rep$NAA[i, 1])  #for old model
 }
 
+om_input_P$data$agg_catch_sigma[1:n_hist_years, ] <- input_hist$data$agg_catch_sigma
+om_input_P$data$selblock_pointer_fleets[1:n_hist_years, ] <- input_hist$data$selblock_pointer_fleets
+
 om_input_P$data$agg_index_sigma[1:n_hist_years, ] <- input_hist$data$agg_index_sigma
 om_input_P$data$use_indices[1:n_hist_years, ]     <- input_hist$data$use_indices
 om_input_P$data$use_index_paa[1:n_hist_years, ]   <- input_hist$data$use_index_paa
 
 for (iy in (n_hist_years + 1L):n_proj_years) {
   om_input_P$data$agg_index_sigma[iy, ] <- input_hist$data$agg_index_sigma[n_hist_years, ]
+  om_input_P$data$agg_catch_sigma[iy, ] <- input_hist$data$agg_catch_sigma[n_hist_years, ]
+  om_input_P$data$selblock_pointer_fleets [iy, ] <- input_hist$data$selblock_pointer_fleets[n_hist_years, ]
 }
 ```
 
@@ -652,7 +656,7 @@ if (!is.null(unfitted_om_P$parList$log_N1)) {
   unfitted_om_P$parList$log_N1 <- log(OM$rep$N1)
 }
 
-hist_idx <- 1:(first_free_year - 3L) #subtract assess interval?
+hist_idx <- 1:(first_free_year - 2L) 
 unfitted_om_P$input$par$log_NAA[1, 1, hist_idx, ] <-
   log(OM$rep$NAA[1, 1, hist_idx + 1L, ])
 
@@ -678,7 +682,7 @@ if (!is.null(unfitted_om_P$env$map)) {
 ```
 
 ```{r}
-last_fixed_idx <- first_free_year - 3L
+last_fixed_idx <- first_free_year - 2L
 if (last_fixed_idx >= 1L) {
   unfitted_om_P$input$par$log_NAA[1, 1, future_idx, ] <-
     array(
