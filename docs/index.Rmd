@@ -16,3 +16,6 @@ output: html_document
 <a href="https://sgaichas.github.io/spasam-mse-test/SummerFlounderTest.html" target="_blank">Can we make a summer flounder OM? WIP- June 23 2026</a> 
 
 <a href="https://sgaichas.github.io/spasam-mse-test/TestMAFMC_HCR.html" target="_blank">Integrating MAFMC risk policy and HCR into SPASAM.MSE;  WIP- June 25 2026</a> 
+
+<a href="https://sgaichas.github.io/spasam-mse-test/ButterfishTest_MAFMC_HCR.html" target="_blank">Use 2024 Butterfish MT as MSE basis with MAFMC HCR;  August 19 2026</a> 
+
