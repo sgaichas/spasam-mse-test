@@ -433,7 +433,7 @@ basic_info     <- info$basic_info
 catch_info_use <- info$catch_info
 index_info_use <- info$index_info
 
-#catch_info_use$selblock_pointer_fleets[1:n_hist_years, ] <- input$data$selblock_pointer_fleets
+catch_info_use$selblock_pointer_fleets[1:n_hist_years, ] <- input$data$selblock_pointer_fleets
 
 catch_info_use$agg_catch[1:n_hist_years, ]     <- input$data$agg_catch
 catch_info_use$catch_paa[, 1:n_hist_years, ]   <- input$data$catch_paa
@@ -672,6 +672,12 @@ unfitted_om_P <- fit_wham(
 
 Simulate the future
 
+Notes:
+
+* If I am reading correctly, `update_om_fn()` will update *all* of the observations, not just the future ones. This is why the full agg_catch series changes in the operating model input. So do the survey indices. (Also it resurrects the Albatross for future years, I'll have to take that out by hand.) 
+* But the predicted catch from the rep agrees for the historic period
+* Do we want the EMs to have fully simulated catch series, or something close to the true catch series for the historical period?
+
 ```{r}
 seed <- 12345L
 
@@ -844,8 +850,8 @@ assess_years <- seq(
 
 NAA_re_em <- NAA_re
 NAA_re_em$N1_model <- "equilibrium"
-NAA_re_em$sigma    <- "rec"
-NAA_re_em$cor      <- "iid"
+NAA_re_em$sigma    <- "rec+1" #"rec"
+NAA_re_em$cor      <- "ar1_y" #"iid"
 
 update_catch_info_list <- list(
   agg_catch_sigma = om_input_P$data$agg_catch_sigma,
@@ -863,7 +869,7 @@ update_index_info_list <- list(
   remove_paa_years = remove_paa_years1
 )
 
-#info$catch_info$selblock_pointer_fleets  <-  OM$input$data$selblock_pointer_fleets #added
+info$catch_info$selblock_pointer_fleets  <-  om_input_P$data$selblock_pointer_fleets #added
 
 
 ```
@@ -872,13 +878,12 @@ HCR Type 1, 75% FXSPR
 
 Some issues:
 
-*  The fleet selectivity block pointer is not getting passed to the EM even when I add it directly to the info object above
+*  The fleet selectivity block pointer is not getting passed to the EM. I tried to add it directly to the info object above. This misaligns the input. Selectivities in general seem to have problems, are the EMs fixing different ones than in the om input?
 
 *  EM Input catch as noted above is different from the OM rep catch (same as original catch) and matches the OM input catch
 
-*  The EM is not converging. Catch in the first year is astronomical trying to use the reference point so my first try is subbing in the SSC F ref pt of 2/3M
-
-*  Also the EM is nothing like the actual assessment... 
+*  The EM is not converging. Catch in the first year is astronomical (?trying to use the reference point) so my first try is subbing in the SSC F ref pt of 2/3M if I can
+ 
 
 
 ```{r}
@@ -927,6 +932,178 @@ hcr1 <- list(
   
 #}
 ```
+
+
+Compare
+
+Catch: real assessment input (red) predicted (blue), om_future input(black), om_future predicted (orange), and EM [[3]] input (black dashed) and predicted (green dashed)
+
+Confirming that implemented EM catch is *way* too high, doesn't seem the EM can recover from this
+
+```{r}
+plot(
+  om_future$input$data$agg_catch, #[1:n_hist_years],
+  type = "l",
+  main = "Input Catch comparison",
+  xlab = "Year index",
+  ylab = "Input Catch"
+)
+lines(OM$input$data$agg_catch, col = "red", lwd = 2)
+lines(OM$rep$pred_catch, col = "blue")
+#lines(unfitted_om_P$rep$pred_catch, col = "blue")
+lines(unfitted_om_P$input$data$agg_catch, col = "purple")
+lines(om_future$rep$pred_catch, col = "orange")
+lines(mod1$em_input[[3]]$data$agg_catch, lwd = 2, lty = 2)
+lines(mod1$em_list[[3]]$pred_catch, col = "green", lwd = 2, lty = 2)
+#lines(mod1$em_input[[2]]$data$agg_catch, lwd = 2, lty = 2)
+
+```
+
+
+Indices
+
+The index fits from the EM are much closer to the om_future model which are identical to the assessment predicted indices
+
+Albatross: real assessment input (red), om_future input(black), om_future predicted (orange), and EM [[3]] input (black dashed) and predicted (green dashed)
+
+```{r}
+
+plot(
+  om_future$input$data$agg_indices[,1],
+  type = "l",
+  main = "Input Index comparison: Albatross",
+  xlab = "Year index",
+  ylab = "Input Index",
+  ylim = c(0, 2500000),
+  xlim = c(0, 41)
+)
+lines(OM$input$data$agg_indices[,1], col = "red", lwd = 2)
+lines(OM$rep$pred_indices[,1], col = "blue")
+#lines(unfitted_om_P$rep$pred_catch, col = "blue")
+#lines(unfitted_om_P$input$data$agg_catch, col = "purple")
+lines(om_future$rep$pred_indices[,1], col = "orange")
+lines(mod1$em_input[[3]]$data$agg_indices[,1], lwd = 2, lty = 2)
+lines(mod1$em_list[[3]]$pred_indices[,1], col = "green", lwd = 2, lty = 2)
+#lines(mod1$em_input[[2]]$data$agg_catch, lwd = 2, lty = 2)
+```
+
+Fall Bigelow: real assessment input (red), om_future input(black), om_future predicted (orange), and EM [[3]] input (black dashed) and predicted (green dashed)
+
+```{r}
+
+plot(
+  om_future$input$data$agg_indices[,2],
+  type = "l",
+  main = "Input Index comparison: Fall Bigelow",
+  xlab = "Year index",
+  ylab = "Input Index",
+  ylim = c(0, 6500000),
+  xlim = c(0, 41)
+)
+lines(OM$input$data$agg_indices[,2], col = "red", lwd = 2)
+lines(OM$rep$pred_indices[,2], col = "blue")
+#lines(unfitted_om_P$rep$pred_catch, col = "blue")
+#lines(unfitted_om_P$input$data$agg_catch, col = "purple")
+lines(om_future$rep$pred_indices[,2], col = "orange")
+lines(mod1$em_input[[3]]$data$agg_indices[,2], lwd = 2, lty = 2)
+lines(mod1$em_list[[3]]$pred_indices[,2], col = "green", lwd = 2, lty = 2)
+#lines(mod1$em_input[[2]]$data$agg_catch, lwd = 2, lty = 2)
+```
+
+Fall NEAMAP: real assessment input (red), om_future input(black), om_future predicted (orange), and EM [[3]] input (black dashed) and predicted (green dashed)
+
+```{r}
+
+plot(
+  om_future$input$data$agg_indices[,3],
+  type = "l",
+  main = "Input Index comparison: Fall NEAMAP",
+  xlab = "Year index",
+  ylab = "Input Index",
+  ylim = c(0, 3500000),
+  xlim = c(0, 41)
+)
+lines(OM$input$data$agg_indices[,3], col = "red", lwd = 2)
+lines(OM$rep$pred_indices[,3], col = "blue")
+#lines(unfitted_om_P$rep$pred_catch, col = "blue")
+#lines(unfitted_om_P$input$data$agg_catch, col = "purple")
+lines(om_future$rep$pred_indices[,3], col = "orange")
+lines(mod1$em_input[[3]]$data$agg_indices[,3], lwd = 2, lty = 2)
+lines(mod1$em_list[[3]]$pred_indices[,3], col = "green", lwd = 2, lty = 2)
+#lines(mod1$em_input[[2]]$data$agg_catch, lwd = 2, lty = 2)
+```
+
+Spring Bigelow: real assessment input (red), om_future input(black), om_future predicted (orange), and EM [[3]] input (black dashed) and predicted (green dashed)
+
+```{r}
+
+plot(
+  om_future$input$data$agg_indices[,4],
+  type = "l",
+  main = "Input Index comparison: Spring Bigelow",
+  xlab = "Year index",
+  ylab = "Input Index",
+  ylim = c(0, 10000000),
+  xlim = c(0, 41)
+)
+lines(OM$input$data$agg_indices[,4], col = "red", lwd = 2)
+lines(OM$rep$pred_indices[,4], col = "blue")
+#lines(unfitted_om_P$rep$pred_catch, col = "blue")
+#lines(unfitted_om_P$input$data$agg_catch, col = "purple")
+lines(om_future$rep$pred_indices[,4], col = "orange")
+lines(mod1$em_input[[3]]$data$agg_indices[,4], lwd = 2, lty = 2)
+lines(mod1$em_list[[3]]$pred_indices[,4], col = "green", lwd = 2, lty = 2)
+#lines(mod1$em_input[[2]]$data$agg_catch, lwd = 2, lty = 2)
+```
+
+Spring NEAMAP: real assessment input (red), om_future input(black), om_future predicted (orange), and EM [[3]] input (black dashed) and predicted (green dashed)
+
+```{r}
+
+plot(
+  om_future$input$data$agg_indices[,5],
+  type = "l",
+  main = "Input Index comparison: Spring NEAMAP",
+  xlab = "Year index",
+  ylab = "Input Index",
+  ylim = c(0, 600000),
+  xlim = c(0, 41)
+)
+lines(OM$input$data$agg_indices[,5], col = "red", lwd = 2)
+lines(OM$rep$pred_indices[,5], col = "blue")
+#lines(unfitted_om_P$rep$pred_catch, col = "blue")
+#lines(unfitted_om_P$input$data$agg_catch, col = "purple")
+lines(om_future$rep$pred_indices[,5], col = "orange")
+lines(mod1$em_input[[3]]$data$agg_indices[,5], lwd = 2, lty = 2)
+lines(mod1$em_list[[3]]$pred_indices[,5], col = "green", lwd = 2, lty = 2)
+#lines(mod1$em_input[[2]]$data$agg_catch, lwd = 2, lty = 2)
+```
+
+YOY: real assessment input (red), om_future input(black), om_future predicted (orange), and EM [[3]] input (black dashed) and predicted (green dashed)
+
+```{r}
+
+plot(
+  om_future$input$data$agg_indices[,6],
+  type = "l",
+  main = "Input Index comparison: YOY",
+  xlab = "Year index",
+  ylab = "Input Index",
+  ylim = c(0, 350),
+  xlim = c(0, 41)
+)
+lines(OM$input$data$agg_indices[,6], col = "red", lwd = 2)
+lines(OM$rep$pred_indices[,6], col = "blue")
+#lines(unfitted_om_P$rep$pred_catch, col = "blue")
+#lines(unfitted_om_P$input$data$agg_catch, col = "purple")
+lines(om_future$rep$pred_indices[,6], col = "orange")
+lines(mod1$em_input[[3]]$data$agg_indices[,6], lwd = 2, lty = 2)
+lines(mod1$em_list[[3]]$pred_indices[,6], col = "green", lwd = 2, lty = 2)
+#lines(mod1$em_input[[2]]$data$agg_catch, lwd = 2, lty = 2)
+```
+
+Age comps are also reportedly 0s
+
 
 HCR Type 1, 100% FXSPR
 
