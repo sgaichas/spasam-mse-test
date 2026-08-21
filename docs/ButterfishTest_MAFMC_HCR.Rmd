@@ -96,7 +96,7 @@ first_free_year <- 36L # year after last historical year
 
 Historical model
 
-I don't need most of this because I want to use the original assessment directly. Kept stuff commented out below
+I don't need most of this because I want to use the original assessment directly. Kept the code blocks but mostly commented out below aside from variables used later
 
 Bio inputs
 
@@ -138,7 +138,7 @@ Catch and index observation settings
 # )
 ```
 
-Alternatively take from the assessment? No, the dimensioning is wrong for SPASAM.MSE but I think the indices will break without year specific use indices flags--wait that gets fixed below
+Alternatively take from the assessment? Try if not using the full fitted assessment, not necessary here
 
 ```{r}
 
@@ -226,7 +226,7 @@ Build the model scaffold
 
 Selectivity, M, etc
 
-This is wrong, should be all age specific and iid I think to match the butterfish assessment, but this doesnt get used anyway
+I started redimensioning this but stopped because I'm just reading in the original butterfish model
 
 ```{r}
 # sel_hist <- list(
@@ -265,7 +265,7 @@ This is wrong, should be all age specific and iid I think to match the butterfis
 # )
 ```
 
-Prep and fit historical model
+Prep and fit historical model, not doing this just reading in 2024 MT model in WHAM 2.0
 
 ```{r}
 # input_histfit <- prepare_wham_input(
@@ -369,7 +369,7 @@ user_waa$waa_pointer_M        <- OM$input$data$waa_pointer_M # this is null in i
 
 ```
 
-Catch and index, may have the same issue as above, see if year specific will work later
+Catch and index
 
 ```{r}
 # catch_info <- list(
@@ -421,6 +421,7 @@ info <- SPASAM.MSE::generate_basic_info(
   base.years = year_start:year_end,
   n_feedback_years = MSE_years,
   n_ages = n_ages,
+  #life_history = "short", #added; need?
   catch_info = catch_info,
   index_info = index_info,
   user_waa = user_waa,
@@ -499,29 +500,6 @@ NAA_re <- list(
 
 Now trying to make the OM
 
-None of the below is true with a modern WHAM model, ignore
-
-```
-The block below throws an error copied below
-
---Creating input---------------------------------------------------------------------------------------------------------------------
-
-basic_info done
-catch done
-indices done
-Error in set_WAA(input, waa_opts) : 
-  some basic_info$waa_pointer_ssb are outside the number of waa matrices.
-3.
-stop("some basic_info$waa_pointer_ssb are outside the number of waa matrices.\n")
-2.
-set_WAA(input, waa_opts)
-1.
-wham::prepare_wham_input(basic_info = basic_info, selectivity = sel3,
-M = M, NAA_re = NAA_re, catch_info = catch_info_use, index_info = index_info_use,
-F = F_info, age_comp = "logistic-normal-pool0")
-
-In order to fix this I had to add the two lines below setting basic_info$waa_pointer_ssb and M to NULL; they do get added back later
-```
 
 ```{r}
 
@@ -613,26 +591,6 @@ om_input_P <- SPASAM.MSE::update_input_index_info(
 ```
 
 Now compile projection OM, fingers crossed--works, it was all the old WHAM format causing issues
-
-```
-Seems like a blessing, just an error not an R bomb:
-
-Error in getParameterOrder(data, parameters, new.env(), DLL = DLL) : 
-  Error when reading the variable: 'catch_paa_pars'. Please check data and parameters.
-3.
-getParameterOrder(data, parameters, new.env(), DLL = DLL)
-2.
-TMB::MakeADFun(input$data, input$par, DLL = "wham", random = input$random,
-map = input$map, silent = MakeADFun.silent)
-1.
-fit_wham(om_input_P, do.fit = FALSE, do.brps = FALSE, MakeADFun.silent = TRUE)
-
-Fixed the error above and a subsequent one for index_paa_pars by adding the matrices in lines 535-536
-
-And NOW it blows up on fit_wham
-
-progress?
-```
 
 ```{r}
 om_input_P$data$do_simulate_N_re <- 1L
@@ -842,6 +800,33 @@ plot(
 lines(OM$rep$SSB[1:n_hist_years], col = "red")
 ```
 
+OK but catch history? Predicted catch is the same
+
+```{r}
+plot(
+  om_future$rep$pred_catch, #[1:n_hist_years],
+  type = "l",
+  main = "Historical Catch comparison",
+  xlab = "Year index",
+  ylab = "Pred Catch"
+)
+lines(OM$rep$pred_catch, col = "red")
+```
+
+Input catch is different, should I be worried? Input catch appears to go to the EM so maybe yes
+
+```{r}
+plot(
+  om_future$input$data$agg_catch, #[1:n_hist_years],
+  type = "l",
+  main = "Input Catch comparison",
+  xlab = "Year index",
+  ylab = "Input Catch"
+)
+lines(OM$input$data$agg_catch, col = "red")
+```
+
+
 ### Now try an MSE
 
 Assessment years and settings for EM, at first change only assessment interval to 3
@@ -877,9 +862,24 @@ update_index_info_list <- list(
   remove_paa_pointer = 1:6,
   remove_paa_years = remove_paa_years1
 )
+
+#info$catch_info$selblock_pointer_fleets  <-  OM$input$data$selblock_pointer_fleets #added
+
+
 ```
 
 HCR Type 1, 75% FXSPR
+
+Some issues:
+
+*  The fleet selectivity block pointer is not getting passed to the EM even when I add it directly to the info object above
+
+*  EM Input catch as noted above is different from the OM rep catch (same as original catch) and matches the OM input catch
+
+*  The EM is not converging. Catch in the first year is astronomical trying to use the reference point so my first try is subbing in the SSC F ref pt of 2/3M
+
+*  Also the EM is nothing like the actual assessment... 
+
 
 ```{r}
 hcr1 <- list(
@@ -922,7 +922,7 @@ hcr1 <- list(
     save.last.em = TRUE,
     FXSPR_init = 0.5,
     process_fix = TRUE,
-    first_free_year = 37
+    first_free_year = 36
   )
   
 #}
@@ -971,7 +971,7 @@ hcr2 <- list(
     save.last.em = TRUE,
     FXSPR_init = 0.5,
     process_fix = TRUE,
-    first_free_year = 37
+    first_free_year = 36
   )
   
 #}
@@ -1020,7 +1020,7 @@ hcr3 <- list(
     save.last.em = TRUE,
     FXSPR_init = 0.5,
     process_fix = TRUE,
-    first_free_year = 37
+    first_free_year = 36
   )
   
 ```
