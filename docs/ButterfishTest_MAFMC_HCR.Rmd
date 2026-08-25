@@ -433,7 +433,7 @@ basic_info     <- info$basic_info
 catch_info_use <- info$catch_info
 index_info_use <- info$index_info
 
-catch_info_use$selblock_pointer_fleets[1:n_hist_years, ] <- input$data$selblock_pointer_fleets
+#catch_info_use$selblock_pointer_fleets[1:n_hist_years, ] <- input$data$selblock_pointer_fleets
 
 catch_info_use$agg_catch[1:n_hist_years, ]     <- input$data$agg_catch
 catch_info_use$catch_paa[, 1:n_hist_years, ]   <- input$data$catch_paa
@@ -576,6 +576,13 @@ remove_paa_years1 <- if (max_paa > 0) {
   }
   out
 } else NULL
+
+#added
+om_input_P <- SPASAM.MSE::update_input_catch_info(
+  om_input_P,
+  agg_catch_sigma = om_input_P$data$agg_catch_sigma,
+  catch_Neff = om_input_P$data$catch_Neff
+)
 
 om_input_P <- SPASAM.MSE::update_input_index_info(
   om_input_P,
@@ -850,8 +857,8 @@ assess_years <- seq(
 
 NAA_re_em <- NAA_re
 NAA_re_em$N1_model <- "equilibrium"
-NAA_re_em$sigma    <- "rec+1" #"rec"
-NAA_re_em$cor      <- "ar1_y" #"iid"
+NAA_re_em$sigma    <- "rec" #"rec+1" 
+NAA_re_em$cor      <- "iid" #"ar1_y" 
 
 update_catch_info_list <- list(
   agg_catch_sigma = om_input_P$data$agg_catch_sigma,
