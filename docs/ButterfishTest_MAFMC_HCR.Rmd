@@ -31,7 +31,7 @@ This is all modified for butterfish
 
 The 2022 butterfish RT models are posted online in the SASI portal [here](https://apps-nefsc.fisheries.noaa.gov/saw/sasi_files.php?year=2022&species_id=16&stock_id=6&review_type_id=5&info_type_id=3&map_type_id=&filename=WHAM_models.zip). 
 
-MT assessments are not posted (maybe someday?) but Chuck kindly sent the 2024 MT outputs when I requested them; and converted them to multi-wham, which I think made all the difference. A day or two was spent trying to make the RT model work but it kept blowing up because WHAM 2.0 is very different from WHAM 1.0
+Chuck kindly sent the 2024 MT outputs when I requested them; and converted them to multi-wham, which I think made all the difference in getting this up and running. A day or two was spent trying to make the RT model work but it kept blowing up because WHAM 2.0 is very different from WHAM 1.0
 
 Read in the models (2024 MT in WHAM 2.0)
 
@@ -681,7 +681,7 @@ Simulate the future
 
 Notes:
 
-* If I am reading correctly, `update_om_fn()` will update *all* of the observations, not just the future ones. This is why the full agg_catch series changes in the operating model input. So do the survey indices. (Also it resurrects the Albatross for future years, I'll have to take that out by hand.) 
+* If I am reading correctly, `update_om_fn()` will update *all* of the observations, not just the future ones. This is why the full agg_catch series changes in the operating model input. So do the survey indices. (Also it resurrects the Albatross for future years, I'll have to take that out by hand?) 
 * But the predicted catch from the rep agrees for the historic period
 * Do we want the EMs to have fully simulated catch series, or something close to the true catch series for the historical period?
 
@@ -885,11 +885,11 @@ HCR Type 1, 75% FXSPR
 
 Some issues:
 
-*  The fleet selectivity block pointer is not getting passed to the EM. I tried to add it directly to the info object above. This misaligns the input. Selectivities in general seem to have problems, are the EMs fixing different ones than in the om input?
+*  The fleet selectivity block pointer is not getting passed to the EM. I tried to add it directly to the info object above. Therefore the selectivites are misaligned in the input. Selectivities in general seem to have problems, are the EMs fixing different ones than in the om input?
 
 *  EM Input catch as noted above is different from the OM rep catch (same as original catch) and matches the OM input catch
 
-*  The EM is not converging. Catch in the first year is astronomical (?trying to use the reference point) so my first try is subbing in the SSC F ref pt of 2/3M if I can
+*  The EM is not converging. Catch in the first year is astronomical (?trying to use the reference point) so my first try is subbing in the SSC F ref pt of 2/3M if I can--actually I don't see an easy way to do this. I would need to add a constant F HCR. An approximation, tried in model 2, is a very low percent of F_XSPR. With butterfish F OFL around 5, getting to 2/3 M where M is 1.23 would be about 16% F_XSPR
  
 
 
@@ -1112,12 +1112,12 @@ lines(mod1$em_list[[3]]$pred_indices[,6], col = "green", lwd = 2, lty = 2)
 Age comps are also reportedly 0s
 
 
-HCR Type 1, 100% FXSPR
+HCR Type 1, Set F to 2/3 M
 
 ```{r}
 hcr2 <- list(
   hcr.type = 1,
-  hcr.opts = list(use_FXSPR = TRUE, percentFXSPR = 100)
+  hcr.opts = list(use_FXSPR = TRUE, percentFXSPR = 16) # try to get closer to 2/3 M ref pt
 )
 
 # mod2_file <- system.file("extdata", "mod2.RDS", package = "SPASAM.MSE")
@@ -1162,6 +1162,12 @@ hcr2 <- list(
 ```
 
 Now try the MAFMC rule, HCR type 4
+
+But I would need to sub in the SSC F OFL so the function needs modification, this still uses 100% F_XSPR as F_OFL
+
+Also, does the SSC just sub in the F and not recalculate SSB_FXSPR? If so I can modify the function, if not it is WAY more complex.
+
+This is full FXSPR
 
 ```{r}
 hcr3 <- list(
@@ -1209,6 +1215,56 @@ hcr3 <- list(
   
 ```
 
+This tries to cut back the F OFL as the SSC does but without changing SSB_MSY
+
+My hack only works for the first OFL
+
+```{r}
+hcr4 <- list(
+  hcr.type = 4,
+  hcr.opts = list(use_FXSPR = TRUE, percentFXSPR = 16) # try to get closer to 2/3 M ref pt
+)
+
+# mod2_file <- system.file("extdata", "mod2.RDS", package = "SPASAM.MSE")
+# 
+# if (file.exists(mod2_file)) {
+#   
+#   mod2 <- readRDS(mod2_file)
+#   
+# } else {
+  
+  mod4 <- loop_through_fn(
+    om = om_future,
+    em_info = info,
+    random = "log_NAA",
+    M_em = M,
+    sel_em = sel3,
+    NAA_re_em = NAA_re_em,
+    age_comp_em = "logistic-normal-pool0",
+    em.opt = list(
+      separate.em = FALSE,
+      separate.em.type = 1,
+      do.move = FALSE,
+      est.move = FALSE
+    ),
+    update_index_info = update_index_info_list,
+    update_catch_info = update_catch_info_list,
+    assess_years = assess_years,
+    assess_interval = assess_interval,
+    base_years = base_years,
+    year.use = 35,
+    add.years = TRUE,
+    seed = 12345L,
+    hcr = hcr4,
+    save.sdrep = FALSE,
+    save.last.em = TRUE,
+    FXSPR_init = 0.5,
+    process_fix = TRUE,
+    first_free_year = 36
+  )
+  
+```
+
 Compare HCRs
 
 ```{r}
@@ -1219,7 +1275,7 @@ plot(
   col = "blue",
   xlab = "Year index",
   ylab = "SSB",
-  main = "MSE comparison: SSB under three HCR settings"
+  main = "MSE comparison: SSB under four HCR settings"
 )
 
 lines(
@@ -1233,17 +1289,25 @@ lines(
   mod3$om$rep$SSB,
   col = "green",
   lwd = 2,
-  lty = 2
+  lty = 3
+)
+
+
+lines(
+  mod4$om$rep$SSB,
+  col = "purple",
+  lwd = 2,
+  lty = 4
 )
 
 abline(v = first_free_year, lty = 3)
 
 legend(
   "topright",
-  legend = c("75% FXSPR", "100% FXSPR", "Mid HCR", "Start of feedback period"),
-  col = c("blue", "red", "green", "black"),
-  lty = c(1, 2, 3, 4),
-  lwd = c(2, 2, 2, 1),
+  legend = c("75% FXSPR", "16% FXSPR", "Mid HCR", "Mid HCR SSC OFL", "Start of feedback period"),
+  col = c("blue", "red", "green", "purple", "black"),
+  lty = c(1, 2, 3, 4, 3),
+  lwd = c(2, 2, 2, 2, 1),
   bty = "n"
 )
 ```
